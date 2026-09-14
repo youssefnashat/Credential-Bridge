@@ -109,7 +109,7 @@ def make_model(model_id: str | None = None, max_tokens: int = 3000) -> Model:
     model_id = model_id or os.getenv("CREDBRIDGE_MODEL")
     if provider == "anthropic":
         # fail at build time, not on the first request (where reason() would retry it once)
-        if not (os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN")):
+        if not any((os.getenv(k) or "").strip() for k in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN")):
             raise ValueError("CREDBRIDGE_PROVIDER=anthropic needs ANTHROPIC_API_KEY (or ANTHROPIC_AUTH_TOKEN) set")
         from strands.models.anthropic import AnthropicModel  # lazy: `anthropic` is an optional extra
         return AnthropicModel(model_id=model_id or ANTHROPIC_DEFAULT_MODEL, max_tokens=max_tokens)
@@ -164,7 +164,7 @@ def reason(req: ReasonRequest, agent: Agent | None = None) -> ReasonResponse:
     except Exception as e:  # noqa: BLE001
         log.warning("structured output failed (%s); falling back to text+parse", e)
         out = _parse(str(_fresh(agent)(task)))
-    return _renumber(out)
+    return _ground(_renumber(out), req)
 
 
 def _parse(text: str) -> ReasonResponse:
@@ -182,4 +182,39 @@ def _parse(text: str) -> ReasonResponse:
 def _renumber(r: ReasonResponse) -> ReasonResponse:
     for i, s in enumerate(r.steps, 1):
         s.id = i
+    return r
+
+
+def _norm_url(u: str) -> str:
+    """Compare URLs modulo scheme/host case, trailing slash, fragment and trailing punctuation —
+    the same rule as eval_run.norm_url, so code and eval agree on what counts as grounded."""
+    from urllib.parse import urlsplit
+    s = urlsplit(u.strip().rstrip(".,;:)"))
+    q = f"?{s.query}" if s.query else ""
+    return f"{s.scheme.lower()}://{s.netloc.lower()}{s.path.rstrip('/')}{q}"
+
+
+def _urls_in(v: Any) -> set[str]:
+    import re
+    if isinstance(v, str):  # only real URLs: lookup() also has non-URL strings like source="kb"
+        return {_norm_url(m) for m in re.findall(r"https?://[^\s\"'<>]+", v)}
+    items = v.values() if isinstance(v, dict) else v if isinstance(v, list) else []
+    return set().union(*(_urls_in(x) for x in items))
+
+
+def _ground(r: ReasonResponse, req: ReasonRequest) -> ReasonResponse:
+    """Loss-guard #2 in code, not the prompt: regulator/regulatorUrl come from the grounding lookup
+    (null when unregulated/unknown), and a step sourceUrl survives only if it is in that
+    jurisdiction's URL set (its ruleset + regulators.json entry). Titles/statuses/wording stay the model's."""
+    from .reference import _compact
+    p = req.profile
+    g = lookup(p.profession, p.targetCountry, p.targetRegion)
+    allowed = _urls_in(g) | _urls_in(_compact().get(p.profession, {}).get(g.get("region_key") or "", {}))
+    grounded = not (g.get("unregulated") or g.get("unknown_region"))
+    r.regulator = g.get("regulator") if grounded else None
+    r.regulatorUrl = g.get("url") if grounded else None
+    for s in r.steps:
+        if s.sourceUrl is not None and _norm_url(s.sourceUrl) not in allowed:
+            log.warning("dropped ungrounded sourceUrl on step %s: %s", s.id, s.sourceUrl)
+            s.sourceUrl = None
     return r

@@ -27,7 +27,7 @@ PAYLOAD = {"steps": [{"id": 5, "title": "Credential evaluation", "status": "upco
 class Stub(Model):
     """Offline model. tool=True answers via the ReasonResponse structured-output tool; tool=False
     only ever returns text (forces the SDK's structured-output failure -> our text+parse fallback)."""
-    def __init__(self, tool=True): self.tool, self.first_len = tool, []
+    def __init__(self, tool=True, payload=None): self.tool, self.first_len, self.payload = tool, [], payload or PAYLOAD
     def update_config(self, **kw): pass
     def get_config(self): return {}
     async def structured_output(self, *a, **kw): raise NotImplementedError
@@ -41,11 +41,11 @@ class Stub(Model):
             if self.tool and name:
                 yield {"messageStart": {"role": "assistant"}}
                 yield {"contentBlockStart": {"start": {"toolUse": {"name": name, "toolUseId": "t1"}}}}
-                yield {"contentBlockDelta": {"delta": {"toolUse": {"input": json.dumps(PAYLOAD)}}}}
+                yield {"contentBlockDelta": {"delta": {"toolUse": {"input": json.dumps(self.payload)}}}}
                 yield {"contentBlockStop": {}}
                 yield {"messageStop": {"stopReason": "tool_use"}}
                 return
-            text = "here you go " + json.dumps(PAYLOAD)
+            text = "here you go " + json.dumps(self.payload)
         yield {"messageStart": {"role": "assistant"}}
         yield {"contentBlockDelta": {"delta": {"text": text}}}
         yield {"contentBlockStop": {}}
@@ -147,6 +147,42 @@ out = reason(req("C"), agent=Agent(model=stub, tools=TOOLS, system_prompt=SYSTEM
 assert out.logEntry.text == "Plan built." and [s.id for s in out.steps] == [1, 2]
 assert len(stub.first_len) >= 2 and stub.first_len[-1] == 1, stub.first_len  # fallback ran on a fresh agent
 print("OK  fallback text+parse path (on a fresh agent)")
+
+# 6b) grounding is enforced in code (loss-guard #2): regulator/regulatorUrl come from lookup(), and a
+#     sourceUrl outside the jurisdiction's URL set is dropped, whatever the model returned
+import logging
+from app.reference import lookup
+g = lookup("Registered Nurse", "Canada", "Ontario")
+KB_URL, REQ_URL = g["url"], g["requirements"][0]["source"]
+FAB = {"steps": [
+    {"id": 1, "title": "Registration", "status": "upcoming", "detail": "d", "source": "CNO", "sourceUrl": KB_URL},
+    {"id": 2, "title": "Evaluation", "status": "upcoming", "detail": "d", "source": "CNO", "sourceUrl": REQ_URL + "/"},
+    {"id": 3, "title": "Fake board sign-off", "status": "not-started", "detail": "d",
+     "source": "Ontario Nursing Authority", "sourceUrl": "https://example.invalid/ona"},
+    {"id": 4, "title": "Other jurisdiction", "status": "not-started", "detail": "d",
+     "source": "NMC", "sourceUrl": "https://www.nmc.org.uk/registration/"}],
+    "logEntry": {"text": "Plan built.", "flag": False},
+    "regulator": "Ontario Nursing Authority", "regulatorUrl": "https://example.invalid/ona"}
+dropped = []
+h = logging.Handler(); h.emit = lambda rec: dropped.append(rec.getMessage())
+agent_mod.log.addHandler(h)
+try:
+    out = reason(req("G"), agent=Agent(model=Stub(payload=FAB), tools=TOOLS, system_prompt=SYSTEM, callback_handler=None))
+    swe = req("S"); swe.profile.profession = "Software Engineer"
+    uo = reason(swe, agent=Agent(model=Stub(payload=FAB), tools=TOOLS, system_prompt=SYSTEM, callback_handler=None))
+finally:
+    agent_mod.log.removeHandler(h)
+assert [s.sourceUrl for s in out.steps] == [KB_URL, REQ_URL + "/", None, None], [s.sourceUrl for s in out.steps]
+assert (out.regulator, out.regulatorUrl) == (g["regulator"], KB_URL), (out.regulator, out.regulatorUrl)
+assert out.steps[2].title == "Fake board sign-off" and out.steps[2].source == "Ontario Nursing Authority"  # wording stays the model's
+assert sum("ungrounded sourceUrl" in m for m in dropped) == 2 + 4, dropped  # 2 on the RN case, all 4 on SWE
+assert uo.regulator is None and uo.regulatorUrl is None and all(s.sourceUrl is None for s in uo.steps)
+try:  # a whitespace-only key counts as missing
+    with_env({**ANTH, "ANTHROPIC_API_KEY": "  \n"}, build_agent)
+    raise AssertionError("whitespace ANTHROPIC_API_KEY did not raise")
+except ValueError:
+    pass
+print("OK  grounding in code: fabricated regulator/URLs dropped (RN 2, SWE all 4), KB URLs kept; blank key rejected")
 
 # 7) graph end-to-end with the stub: finalize runs only when approved
 agent_mod._model = lambda: Stub()
