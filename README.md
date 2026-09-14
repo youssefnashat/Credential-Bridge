@@ -171,3 +171,12 @@ Apache-2.0 — see [LICENSE](LICENSE).
 
 ## Team
 Kanwar Jhattu · Youssef Nashaat
+
+## Frontend
+Static UI by Nash — `index.html`, `styles.css`, `app.js`, `agent.js`, `pathways.js` at the repo root. No build step; the only external request is Google Fonts. Serve it from the repo root and open it in a browser:
+```bash
+python3 -m http.server 8765      # then open http://localhost:8765/
+```
+Any static host works (publish directory = repo root).
+
+> **Status:** as merged, the UI runs a *simulated* agent in the browser (demo mode) — its dates and regulator names are illustrative, not from the KB. Wiring it to `POST /reason` so every step comes from the grounded agent is task T12 in [docs/TASKS.md](docs/TASKS.md).
