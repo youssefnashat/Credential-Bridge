@@ -21,17 +21,17 @@ Detailed beat plan + command sheet: `docs/VIDEO_SCRIPT.md`.
 **Slide 1 · Title** (0:00–0:08)
 > "This is Credential Bridge — an AI agent that maps the licensing pathway for internationally trained professionals. Built with the Strands Agents SDK for the Agents for Humans hackathon, Good Neighbor track."
 
-**Slide 2 · The licensing maze** (0:08–0:30) — **(1) the problem**
-> "Before Aida, a nurse trained in the Philippines, can work in Ontario, she has nine steps to clear — a credential assessment, a language test, registration, a jurisprudence exam, the national NCLEX exam, and more. The order matters, the rules change by province and country, and documents expire. Her police check, for example, is only valid for six months. One expired document can send her back months."
+**Slide 2 · The licensing maze** (0:08–0:35) — **(1) the problem**
+> "Doctors, nurses, engineers and teachers who trained in one country and move to another hit the same wall: before they can work in their own profession, they have to get licensed again. Every profession, in every province, state and country, has its own regulator, its own order of steps and its own deadlines — credential assessments, language tests, exams, supervised practice, background checks — spread across dozens of regulator websites. And the documents expire on different clocks. Miss one dependency, and months of progress and money are lost. On screen is just one example: nine steps for a nurse to practise in Ontario."
 
-**Slide 3 · Two people, one pathway** (0:30–0:45) — **(2) who it's for**
-> "Credential Bridge is for two people: the skilled newcomer trying to get back to their profession, and the settlement caseworker — usually at a nonprofit — who guides dozens of these cases, mostly by hand."
+**Slide 3 · Two groups, one pathway** (0:35–0:50) — **(2) who it's for**
+> "This hurts two groups. The professionals themselves, starting over in a new country. And the settlement agencies and nonprofits whose caseworkers guide them — each juggling dozens of cases across different professions and jurisdictions, mostly by hand, from checklists that go out of date."
 
-**Slide 4 · Unlocking expertise** (0:45–0:55) — **(3) why it matters**
-> "These are shortage professions. Every month a qualified nurse spends stuck in paperwork is a month she isn't working as a nurse — and a correct, conflict-checked pathway lets one caseworker help more people."
+**Slide 4 · Unlocking expertise** (0:50–1:02) — **(3) why it matters**
+> "The cost is shared. These are shortage professions — while qualified people wait, they take survival jobs, and communities lose skills they already have. A correct, conflict-checked pathway gets people back to work sooner, and lets every caseworker help more of them."
 
-**Slide 5 · Live demo** (0:55–1:00)
-> "Let's run a real case."
+**Slide 5 · Live demo** (1:02–1:05)
+> "To show how Credential Bridge handles this, let's follow one real case."
 
 ---
 
