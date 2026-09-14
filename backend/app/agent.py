@@ -8,6 +8,7 @@ contract via pydantic structured output — never templated strings.
 from __future__ import annotations
 import json, logging, os
 from datetime import date
+from functools import lru_cache
 from typing import Any
 
 from strands import Agent, tool
@@ -93,11 +94,29 @@ Rules:
 - Keep logEntry.text plain-language and specific. Never output anything except the structured object."""
 
 
+TOOLS = [get_regulator_rules, months_between, today]
+
+
+@lru_cache(maxsize=1)
+def _model() -> BedrockModel:
+    # one boto client for the process (thread-safe); max_tokens/temperature are direct BedrockConfig
+    # kwargs in strands 1.55 — a `params={...}` dict is an unknown key and gets ignored.
+    return BedrockModel(model_id=MODEL_ID, region_name=REGION, max_tokens=3000, temperature=0.2)
+
+
 def build_agent() -> Agent:
-    model = BedrockModel(model_id=MODEL_ID, region_name=REGION,
-                         params={"max_tokens": 3000, "temperature": 0.2})
-    return Agent(model=model, tools=[get_regulator_rules, months_between, today],
-                 system_prompt=SYSTEM)
+    return Agent(model=_model(), tools=TOOLS, system_prompt=SYSTEM, callback_handler=None)
+
+
+def _fresh(agent: Agent | None) -> Agent:
+    """A new Agent per call. A strands Agent keeps agent.messages across calls (history would leak
+    between applicants) and raises ConcurrencyException on overlapping calls, so the shared agent
+    passed by api/orchestrator is only a template: we reuse its model + prompt, never its state."""
+    if agent is None:
+        return build_agent()
+    if not isinstance(agent, Agent):
+        return agent  # test doubles
+    return Agent(model=agent.model, tools=TOOLS, system_prompt=agent.system_prompt, callback_handler=None)
 
 
 def _task(req: ReasonRequest) -> str:
@@ -113,15 +132,16 @@ def _task(req: ReasonRequest) -> str:
 
 
 def reason(req: ReasonRequest, agent: Agent | None = None) -> ReasonResponse:
-    agent = agent or build_agent()
-    # ---- KNOWN ROUGH EDGE (structured output): if this raises AttributeError/RuntimeError, see
-    #      the fallback below — we parse the last JSON object from a normal agent() call. ----
+    task = _task(req)
+    # structured output via structured_output_model= (Agent.structured_output is deprecated in 1.55).
+    # Fallback: a plain call on another fresh agent, then parse the largest JSON object.
     try:
-        out: ReasonResponse = agent.structured_output(ReasonResponse, _task(req))
+        out = _fresh(agent)(task, structured_output_model=ReasonResponse).structured_output
+        if not isinstance(out, ReasonResponse):
+            raise ValueError("no structured_output on result")
     except Exception as e:  # noqa: BLE001
-        log.warning("structured_output failed (%s); falling back to text+parse", e)
-        raw = str(agent(_task(req)))
-        out = _parse(raw)
+        log.warning("structured output failed (%s); falling back to text+parse", e)
+        out = _parse(str(_fresh(agent)(task)))
     return _renumber(out)
 
 
