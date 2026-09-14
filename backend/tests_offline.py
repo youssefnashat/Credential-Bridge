@@ -71,19 +71,44 @@ assert set(h.tool_names) & {"web_fetch", "http_request"}, h.tool_names
 assert set(a.tool_names) == {"get_regulator_rules", "months_between", "today"}
 print(f"OK  build_agent / build_harvester (tool={h.tool_names}) / build_case_graph offline")
 
-# 1b) provider switch: CREDBRIDGE_PROVIDER=anthropic builds Claude-API-backed agents, no network call
+# 1b) env is read at call time: values set AFTER `import app.agent` (e.g. a late load_dotenv) apply
 from strands.models.anthropic import AnthropicModel
-os.environ.update({"CREDBRIDGE_PROVIDER": "anthropic", "ANTHROPIC_API_KEY": "offline"})
-agent_mod._model.cache_clear()
-try:
-    aa, ha = build_agent(), build_harvester()
-finally:
-    os.environ["CREDBRIDGE_PROVIDER"] = "bedrock"; agent_mod._model.cache_clear()
-for m in (aa.model, ha.model):
+
+
+def with_env(env, fn):
+    """Run fn with env applied (None = unset) on a cold _model() cache, then restore both."""
+    def apply(e):
+        for k, v in e.items():
+            if v is None:
+                os.environ.pop(k, None)
+            else:
+                os.environ[k] = v
+    old = {k: os.environ.get(k) for k in env}
+    apply(env); agent_mod._model.cache_clear()
+    try:
+        return fn()
+    finally:
+        apply(old); agent_mod._model.cache_clear()
+
+
+bm = with_env({"CREDBRIDGE_MODEL": "us.anthropic.claude-opus-5", "AWS_REGION": "us-east-2"}, lambda: build_agent().model)
+assert isinstance(bm, BedrockModel) and bm.config["model_id"] == "us.anthropic.claude-opus-5", bm.config
+assert bm.client.meta.region_name == "us-east-2", bm.client.meta.region_name
+ANTH = {"CREDBRIDGE_PROVIDER": "anthropic", "ANTHROPIC_API_KEY": "offline", "CREDBRIDGE_MODEL": None}
+aa, ha = with_env(ANTH, lambda: (build_agent().model, build_harvester().model))
+for m in (aa, ha):  # provider switch, no network call at construction
     assert isinstance(m, AnthropicModel), type(m)
     assert m.config["model_id"] == "claude-sonnet-5" and m.config["max_tokens"] == 3000 and not m.config.get("params")
-assert isinstance(build_agent().model, BedrockModel)  # default provider restored
-print("OK  CREDBRIDGE_PROVIDER=anthropic -> AnthropicModel(claude-sonnet-5); default stays BedrockModel")
+am = with_env({**ANTH, "CREDBRIDGE_MODEL": "claude-opus-5"}, lambda: build_agent().model)
+assert am.config["model_id"] == "claude-opus-5", am.config
+try:  # fail fast: anthropic without a key raises at build time, not on the first request
+    with_env({**ANTH, "ANTHROPIC_API_KEY": None, "ANTHROPIC_AUTH_TOKEN": None}, build_agent)
+    raise AssertionError("missing ANTHROPIC_API_KEY did not raise")
+except ValueError as e:
+    assert "ANTHROPIC_API_KEY" in str(e), e
+assert with_env({"CREDBRIDGE_TODAY": "2026-09-14"}, agent_mod._today).isoformat() == "2026-09-14"
+assert isinstance(build_agent().model, BedrockModel) and bm is not build_agent().model  # default restored
+print("OK  late env honoured (bedrock model+region, anthropic model, CREDBRIDGE_TODAY); missing key fails at build")
 
 # 2) approval edge: False without approved, True with it
 edge = next(e for e in g.edges if e.from_node.node_id == "pathway" and e.to_node.node_id == "finalize")

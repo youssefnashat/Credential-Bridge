@@ -19,13 +19,16 @@ from .reference import lookup
 
 log = logging.getLogger("credbridge.agent")
 
-MODEL_ID = os.getenv("CREDBRIDGE_MODEL", "us.anthropic.claude-3-7-sonnet-20250219-v1:0")
-REGION = os.getenv("AWS_REGION", "us-west-2")
-TODAY = os.getenv("CREDBRIDGE_TODAY")  # allow demo to pin "today"
+# Model + date env (CREDBRIDGE_PROVIDER/MODEL, AWS_REGION, CREDBRIDGE_TODAY) is read at CALL time, not
+# import, so a load_dotenv() that runs after `import app.agent` still applies. _model() caches the
+# model per process, so set the env before the first request.
+BEDROCK_DEFAULT_MODEL = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-5"
 
 
 def _today() -> date:
-    return date.fromisoformat(TODAY) if TODAY else date.today()
+    pinned = os.getenv("CREDBRIDGE_TODAY")  # allow demo to pin "today"
+    return date.fromisoformat(pinned) if pinned else date.today()
 
 
 # ---- tools the agent can call (deterministic; keeps math + grounding out of the prompt) ----
@@ -101,16 +104,20 @@ def make_model(model_id: str | None = None, max_tokens: int = 3000) -> Model:
     """Model for every Credential Bridge agent. CREDBRIDGE_PROVIDER picks the provider:
     'bedrock' (default; CREDBRIDGE_MODEL + AWS_REGION) or 'anthropic' (Claude API; key from
     ANTHROPIC_API_KEY; needs strands-agents[anthropic]) — a fallback while Bedrock access is pending.
-    No temperature: current Claude models reject sampling params, so it is left out on both."""
+    All model env is read here, per call. No temperature: current Claude models reject sampling params."""
     provider = os.getenv("CREDBRIDGE_PROVIDER", "bedrock").strip().lower()
+    model_id = model_id or os.getenv("CREDBRIDGE_MODEL")
     if provider == "anthropic":
+        # fail at build time, not on the first request (where reason() would retry it once)
+        if not (os.getenv("ANTHROPIC_API_KEY") or os.getenv("ANTHROPIC_AUTH_TOKEN")):
+            raise ValueError("CREDBRIDGE_PROVIDER=anthropic needs ANTHROPIC_API_KEY (or ANTHROPIC_AUTH_TOKEN) set")
         from strands.models.anthropic import AnthropicModel  # lazy: `anthropic` is an optional extra
-        return AnthropicModel(model_id=model_id or os.getenv("CREDBRIDGE_MODEL", "claude-sonnet-5"),
-                              max_tokens=max_tokens)
+        return AnthropicModel(model_id=model_id or ANTHROPIC_DEFAULT_MODEL, max_tokens=max_tokens)
     if provider != "bedrock":
         raise ValueError(f"CREDBRIDGE_PROVIDER must be 'bedrock' or 'anthropic', not {provider!r}")
     # max_tokens is a direct BedrockConfig kwarg in strands 1.55 — a `params={...}` dict is ignored.
-    return BedrockModel(model_id=model_id or MODEL_ID, region_name=REGION, max_tokens=max_tokens)
+    return BedrockModel(model_id=model_id or BEDROCK_DEFAULT_MODEL,
+                        region_name=os.getenv("AWS_REGION", "us-west-2"), max_tokens=max_tokens)
 
 
 @lru_cache(maxsize=1)
