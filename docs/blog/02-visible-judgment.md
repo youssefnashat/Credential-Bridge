@@ -9,32 +9,44 @@ produces the same screen. The evidence that you built an agent is a moment where
 checklist can't: catch a problem, reason about it, and explain the trade-off.
 
 ## The moment we built the demo around
-An internationally trained nurse has a language test valid for 24 months and an NNAS evaluation and
-exam timeline that, once it slips, pushes her registration decision past that 24-month window. A list
-shows both items green. Our agent, on a `simulate_delay` event, reasons over the real dates:
+In our Ontario nursing ruleset, the language test has `validity_months: 24` and
+`valid_at: "registration_decision"` — it must still be valid when the College of Nurses of Ontario makes
+its decision, not just when the applicant applies. If the credential evaluation or exam timeline slips,
+a result that was fine at application can expire before the decision. A list shows both items green.
 
-> "Your IELTS is valid until 2026-03-10, but with the NNAS delay your CNO registration decision now
-> falls in April 2026. CNO requires the language result to be valid *at the decision*, not at
-> application — so this test will have expired. Retake before February, or request the earlier
-> assessment cohort."
+On a `simulate_delay` event, the agent gets the current steps, calls its grounding tool, and is
+instructed to find a real dependent pair that no longer lines up, mark the affected steps `at-risk`,
+and explain it with actual dates. The kind of explanation it is prompted to produce looks like this
+(*illustrative — not a captured output*):
 
-That paragraph isn't templated. The date math lives in deterministic tools (`today`, `months_between`);
-the *decision* — which pair collides, why it matters, what to do — comes from the model reasoning over
-the grounded rule that carries a `valid_at: registration_decision` field.
+> "Your IELTS result is valid until 2027-05-02, but with the evaluation delay your CNO registration
+> decision now falls after that date. CNO needs the language result to be valid at the decision, so
+> book a retake that will still be valid then."
+
+_[TODO(team): replace with a real logEntry from docs/evidence/ before publishing.]_
+
+That paragraph isn't templated. The date math lives in deterministic tools (`today`, pinnable via
+`CREDBRIDGE_TODAY`, and `months_between`); the *decision* — which pair collides, why it matters, what to
+do — comes from the model reasoning over a grounded rule that carries `valid_at`.
+
+`simulate_rejection` is the companion move: the agent marks an early step at-risk, inserts a remediation
+step right after it, renumbers the list, and sets the now-blocked steps to not-started.
 
 ## The second judgment moment
-Switch the profession to Software Engineer. A naive tool forces a licensing template onto it. Ours
-checks the KB, sees `regulated: false`, and says so out loud: software engineering isn't a licensed
-profession in these jurisdictions, so there's no practice licence to obtain — here's a short
-work-authorization path (an ECA for immigration) instead. We coded that on purpose. Recognizing when
-*not* to apply your own template is judgment, and judges notice it.
+Switch the profession to Software Engineer. A naive tool forces a licensing template onto it. Ours calls
+the same grounding tool, which returns `unregulated: true` from our reference table, and the system
+prompt tells the agent to say so plainly: software engineering isn't a licensed profession in these
+jurisdictions, so there's no practice licence to obtain — here's a short work-authorization path (for
+example an Educational Credential Assessment for immigration) instead. Recognizing when *not* to apply
+your own template is judgment, and we made it an explicit, grounded outcome.
 
-## How Strands makes this legible
-Hooks write an audit line for every tool call, so the reasoning is observable, not a black box. The
-whole thing is one focused agent with three tools and a strict system prompt — small enough to read in
-the repo, which is itself part of the pitch.
+## How we keep it legible
+Every step carries the `source` and `sourceUrl` it came from, so a caseworker can check it in one click.
+The API appends one line per request to `data/audit.jsonl` (endpoint, event, step count, flag, latency).
+And the whole reasoner is one focused Strands agent with three tools and a strict system prompt — small
+enough to read in the repo, which is itself part of the pitch.
 
-Next post: shipping the same agent two ways — FastAPI locally, AgentCore Runtime in production —
-without changing a line the frontend sees.
+Next post: shipping the same agent two ways — FastAPI locally and AgentCore Runtime — without changing
+the shape the frontend sees.
 
 *Built with the Strands Agents SDK and Amazon Bedrock.*
