@@ -695,7 +695,7 @@
   CB.MOCK = params.get('mock') === '1';
   CB.API = (params.get('api') || 'http://localhost:8000').replace(/\/+$/, '');
 
-  var TIMEOUT_MS = 120000;
+  var TIMEOUT_MS = 240000;  // live Claude calls on delay/rejection can take ~100s
 
   var EVENTS = {
     'pathway.build':      'build_pathway',
