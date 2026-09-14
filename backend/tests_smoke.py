@@ -18,6 +18,42 @@ check("Physician", "Canada", "Ontario", "CPSO")
 check("Teacher", "Canada", "Ontario", "Ontario College of Teachers")
 check("Software Engineer", "Canada", "Ontario", "not")   # unregulated note contains 'not'
 
+# --- KB reachability: natural frontend profiles must resolve to the curated KB ruleset, not the fallback
+from app.reference import _region_key, _SUB
+from kb.pipeline import kb_store
+
+def kb_check(prof, country, region, jkey):
+    r = lookup(prof, country, region)
+    assert r.get("source") == "kb" and r.get("region_key") == jkey, \
+        f"{prof} @ {country}/{region}: expected kb {jkey}, got {r.get('source')} {r.get('region_key')}"
+    print(f"OK  {prof} @ {country}/{region} -> kb {jkey} ({r['regulator']})")
+
+for prof, country, region, jkey in [
+        ("Registered Nurse", "Canada", "Ontario", "CA-ON"), ("Registered Nurse", "Canada", "British Columbia", "CA-BC"),
+        ("Registered Nurse", "United States", "New York", "US-NY"), ("Registered Nurse", "USA", "California", "US-CA"),
+        ("Registered Nurse", "United Kingdom", "England", "GB"), ("Registered Nurse", "UK", "Scotland", "GB"),
+        ("Registered Nurse", "Australia", "New South Wales", "AU"), ("Registered Nurse", "Germany", "Berlin", "DE"),
+        ("Registered Nurse", "Germany", "Germany", "DE"),        # demo_concurrent case-lena
+        ("Registered Nurse", "Deutschland", "", "DE"), ("Civil Engineer", "Canada", "Ontario", "CA-ON")]:
+    kb_check(prof, country, region, jkey)
+
+# every ruleset in kb/store/** must be reachable from a natural (full-name) profile
+_NAT = {"CA": "Canada", "US": "United States", "GB": "United Kingdom", "AU": "Australia", "DE": "Germany", "IE": "Ireland"}
+_SUBNAME = {f"{c}-{v}": k.title() for k, v in _SUB.items() for c in ("CA", "US") if k.isascii()}
+for rs in kb_store.all_rulesets():
+    j = rs["jurisdiction"]; iso = j.split("-")[0]
+    assert iso in _NAT and ("-" not in j or j in _SUBNAME), f"KB {j}: no natural profile maps here — extend reference._COUNTRY/_SUB"
+    kb_check(rs["profession"], _NAT[iso], _SUBNAME.get(j, ""), j)
+
+# unknown country must NOT silently become a US state; known-but-uncovered stays honest
+r = lookup("Registered Nurse", "Brazil", "São Paulo")
+assert r.get("unknown_region") and not r["region_key"].startswith("US"), r
+print(f"OK  Registered Nurse @ Brazil/São Paulo -> unknown_region ({r['region_key']})")
+r = lookup("Registered Nurse", "Ireland", "Dublin")
+assert r.get("unknown_region") and r["region_key"] == "IE", r
+print("OK  Registered Nurse @ Ireland/Dublin -> unknown_region (IE, not in KB)")
+assert _region_key("Canada", "Nunavut").startswith("CA-") and _region_key("", "England") == "GB"
+
 # contract round-trips
 resp = ReasonResponse(steps=[Step(id=1, title="Credential evaluation (NNAS)", status="upcoming",
         detail="Start NNAS advisory report", source="CNO", sourceUrl="https://cno.org")],
