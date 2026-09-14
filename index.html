@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credential Bridge — licensing pathway navigator</title>
+<meta name="description" content="Map the licensing pathway for an internationally trained professional, and watch it for conflicts.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23F3F5F1'/%3E%3Cpath d='M6 21c0-6 4.5-10 10-10s10 4 10 10' fill='none' stroke='%232F6F62' stroke-width='2'/%3E%3Ccircle cx='6' cy='21' r='2.5' fill='%232F6F62'/%3E%3Ccircle cx='26' cy='21' r='2.5' fill='%232F6F62'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- ─── Intake ─────────────────────────────────────────────────────────── -->
+<main class="intake" id="intake">
+  <div class="intake__inner">
+
+    <div class="mark">
+      <svg class="mark__glyph" viewBox="0 0 32 22" aria-hidden="true">
+        <path d="M3 18c0-7 5.8-13 13-13s13 6 13 13" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="3" cy="18" r="2.6" fill="currentColor"/>
+        <circle cx="29" cy="18" r="2.6" fill="currentColor"/>
+      </svg>
+      <span class="mark__name">Credential&nbsp;Bridge</span>
+    </div>
+
+    <h1 class="intake__title">Before you begin</h1>
+    <p class="intake__lede">
+      Tell us where you trained and where you are headed. We will map the licensing
+      route step by step, then keep watch for the deadline and prerequisite conflicts
+      that normally surface too late to fix.
+    </p>
+
+    <p class="caseslip" id="caseslip" aria-live="polite"></p>
+
+    <form class="form" id="intake-form" novalidate>
+
+      <div class="field" data-field="name">
+        <label class="field__label" for="in-name">Applicant name</label>
+        <input class="input" id="in-name" name="name" type="text" autocomplete="name" placeholder="e.g. Ana Reyes">
+        <p class="field__error" id="err-name" hidden></p>
+      </div>
+
+      <div class="field" data-field="profession">
+        <label class="field__label" for="in-profession">Profession</label>
+        <select class="input input--select" id="in-profession" name="profession">
+          <option value="">Choose a profession</option>
+          <option>Registered Nurse</option>
+          <option>Doctor / Physician</option>
+          <option>Civil Engineer</option>
+          <option>Software Engineer</option>
+          <option>Teacher</option>
+        </select>
+        <p class="field__error" id="err-profession" hidden></p>
+      </div>
+
+      <div class="field" data-field="trainedIn">
+        <label class="field__label" for="in-trained">Country trained in</label>
+        <select class="input input--select" id="in-trained" name="trainedIn">
+          <option value="">Choose a country</option>
+        </select>
+        <p class="field__hint">Recorded on the case file. It does not change the pathway we generate.</p>
+        <p class="field__error" id="err-trainedIn" hidden></p>
+      </div>
+
+      <div class="field" data-field="trainedInRegion" hidden>
+        <label class="field__label" for="in-trained-region">Region trained in</label>
+        <select class="input input--select" id="in-trained-region" name="trainedInRegion">
+          <option value="">Choose a region</option>
+        </select>
+        <p class="field__error" id="err-trainedInRegion" hidden></p>
+      </div>
+
+      <fieldset class="field field--fieldset" data-field="country">
+        <legend class="field__label">Target country</legend>
+        <div class="segmented" id="in-country">
+          <label class="segmented__opt">
+            <input type="radio" name="country" value="Canada">
+            <span>Canada</span>
+          </label>
+          <label class="segmented__opt">
+            <input type="radio" name="country" value="United States">
+            <span>United States</span>
+          </label>
+        </div>
+        <p class="field__error" id="err-country" hidden></p>
+      </fieldset>
+
+      <div class="field" data-field="region">
+        <label class="field__label" for="in-region">Target region</label>
+        <select class="input input--select" id="in-region" name="region" disabled>
+          <option value="">Choose a target country first</option>
+        </select>
+        <p class="field__error" id="err-region" hidden></p>
+      </div>
+
+      <button class="btn btn--primary btn--block" type="submit">Build my pathway</button>
+
+      <p class="form__foot">
+        Demo environment. Nothing is submitted to a regulator, and nothing is kept
+        after you close this tab.
+      </p>
+    </form>
+  </div>
+</main>
+
+<!-- ─── Dashboard ──────────────────────────────────────────────────────── -->
+<div class="app" id="dashboard" hidden>
+
+  <header class="topbar">
+    <div class="mark mark--sm">
+      <svg class="mark__glyph" viewBox="0 0 32 22" aria-hidden="true">
+        <path d="M3 18c0-7 5.8-13 13-13s13 6 13 13" fill="none" stroke="currentColor" stroke-width="1.6"/>
+        <circle cx="3" cy="18" r="2.6" fill="currentColor"/>
+        <circle cx="29" cy="18" r="2.6" fill="currentColor"/>
+      </svg>
+      <span class="mark__name">Credential&nbsp;Bridge</span>
+    </div>
+    <p class="topbar__ref" id="case-ref"></p>
+  </header>
+
+  <div class="app__body">
+
+    <aside class="sidebar">
+
+      <section class="panel">
+        <h2 class="panel__title">Applicant</h2>
+        <p class="applicant" id="side-name"></p>
+        <dl class="meta">
+          <div class="meta__row"><dt>Profession</dt><dd id="side-profession"></dd></div>
+          <div class="meta__row"><dt>Trained in</dt><dd id="side-trained"></dd></div>
+          <div class="meta__row"><dt>Seeking</dt><dd id="side-target"></dd></div>
+        </dl>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel__title">Documents on file</h2>
+        <ul class="docs" id="docs"></ul>
+      </section>
+
+      <section class="panel">
+        <h2 class="panel__title">Simulate a scenario</h2>
+        <p class="panel__note">Send an event to the agent and watch it reason over the pathway again.</p>
+        <div class="sim">
+          <button class="btn btn--quiet" type="button" id="sim-conflict">
+            <span class="sim__dot sim__dot--amber" aria-hidden="true"></span>
+            Trigger a schedule conflict
+          </button>
+          <button class="btn btn--quiet" type="button" id="sim-rejection">
+            <span class="sim__dot sim__dot--rust" aria-hidden="true"></span>
+            Trigger a document rejection
+          </button>
+          <button class="btn btn--ghost" type="button" id="sim-reset">Reset the case</button>
+        </div>
+      </section>
+
+      <button class="linkbtn" type="button" id="start-over">Start over</button>
+    </aside>
+
+    <main class="workspace">
+      <div class="tabs" role="tablist" aria-label="Case views">
+        <button class="tab" role="tab" id="tab-pathway" aria-controls="panel-pathway" aria-selected="true">Pathway</button>
+        <button class="tab" role="tab" id="tab-drafts" aria-controls="panel-drafts" aria-selected="false" tabindex="-1">Drafted applications</button>
+      </div>
+
+      <section class="tabpanel" id="panel-pathway" role="tabpanel" aria-labelledby="tab-pathway" tabindex="0">
+        <div class="pathway">
+          <div class="pathway__main">
+            <header class="secthead">
+              <h2 class="secthead__title" id="pathway-title"></h2>
+              <p class="secthead__sub" id="pathway-sub"></p>
+            </header>
+            <ol class="timeline" id="timeline"></ol>
+          </div>
+
+          <aside class="reasoning">
+            <div class="reasoning__inner">
+              <header class="reasoning__head">
+                <h2 class="reasoning__title">Agent reasoning</h2>
+                <p class="reasoning__sub">Simulated Strands agent · demo mode</p>
+              </header>
+              <ol class="log" id="log"></ol>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section class="tabpanel" id="panel-drafts" role="tabpanel" aria-labelledby="tab-drafts" tabindex="0" hidden>
+        <header class="secthead">
+          <h2 class="secthead__title">Drafted applications</h2>
+          <p class="secthead__sub">Prepared from the case file. Edit anything before you approve it.</p>
+        </header>
+        <div class="drafts" id="drafts"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<div class="toaster" id="toaster" role="status" aria-live="polite"></div>
+
+<script src="pathways.js"></script>
+<script src="agent.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
