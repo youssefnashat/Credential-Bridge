@@ -5,11 +5,9 @@ from __future__ import annotations
 import json, os
 from datetime import datetime, timezone
 from strands import Agent
-from strands.models import BedrockModel
 from strands.vended_tools import http_request  # core strands>=1.55 (httpx), always importable
 
-MODEL_ID = os.getenv("CREDBRIDGE_HARVEST_MODEL", "us.anthropic.claude-3-7-sonnet-20250219-v1:0")
-REGION = os.getenv("AWS_REGION", "us-west-2")
+from app.agent import make_model
 
 def _fetch_tool():
     # web_fetch(markdown) = page -> clean markdown, no nested model call. Needs the optional
@@ -37,7 +35,8 @@ complete/explicit the page was, and needs_review=true unless it was fully explic
 is 'agent'. Output ONLY the JSON object."""
 
 def build_harvester() -> Agent:
-    model = BedrockModel(model_id=MODEL_ID, region_name=REGION, max_tokens=3000, temperature=0.1)
+    # own model id via CREDBRIDGE_HARVEST_MODEL, else the reasoner's; same provider switch
+    model = make_model(os.getenv("CREDBRIDGE_HARVEST_MODEL"))
     return Agent(model=model, tools=[_fetch_tool()], system_prompt=SYSTEM, callback_handler=None)
 
 def harvest(profession: str, jurisdiction: str, regulator: str, url: str, agent: Agent | None = None) -> dict:

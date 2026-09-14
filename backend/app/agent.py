@@ -12,7 +12,7 @@ from functools import lru_cache
 from typing import Any
 
 from strands import Agent, tool
-from strands.models import BedrockModel
+from strands.models import BedrockModel, Model
 
 from .schemas import ReasonRequest, ReasonResponse, Step, LogEntry
 from .reference import lookup
@@ -97,11 +97,26 @@ Rules:
 TOOLS = [get_regulator_rules, months_between, today]
 
 
+def make_model(model_id: str | None = None, max_tokens: int = 3000) -> Model:
+    """Model for every Credential Bridge agent. CREDBRIDGE_PROVIDER picks the provider:
+    'bedrock' (default; CREDBRIDGE_MODEL + AWS_REGION) or 'anthropic' (Claude API; key from
+    ANTHROPIC_API_KEY; needs strands-agents[anthropic]) — a fallback while Bedrock access is pending.
+    No temperature: current Claude models reject sampling params, so it is left out on both."""
+    provider = os.getenv("CREDBRIDGE_PROVIDER", "bedrock").strip().lower()
+    if provider == "anthropic":
+        from strands.models.anthropic import AnthropicModel  # lazy: `anthropic` is an optional extra
+        return AnthropicModel(model_id=model_id or os.getenv("CREDBRIDGE_MODEL", "claude-sonnet-5"),
+                              max_tokens=max_tokens)
+    if provider != "bedrock":
+        raise ValueError(f"CREDBRIDGE_PROVIDER must be 'bedrock' or 'anthropic', not {provider!r}")
+    # max_tokens is a direct BedrockConfig kwarg in strands 1.55 — a `params={...}` dict is ignored.
+    return BedrockModel(model_id=model_id or MODEL_ID, region_name=REGION, max_tokens=max_tokens)
+
+
 @lru_cache(maxsize=1)
-def _model() -> BedrockModel:
-    # one boto client for the process (thread-safe); max_tokens/temperature are direct BedrockConfig
-    # kwargs in strands 1.55 — a `params={...}` dict is an unknown key and gets ignored.
-    return BedrockModel(model_id=MODEL_ID, region_name=REGION, max_tokens=3000, temperature=0.2)
+def _model() -> Model:
+    # one client for the process (thread-safe), shared by every fresh per-call Agent
+    return make_model()
 
 
 def build_agent() -> Agent:
