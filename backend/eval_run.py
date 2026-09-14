@@ -71,12 +71,17 @@ def kb_url_set() -> set[str]:
                          for base, pattern in KB_GLOBS for p in sorted(base.glob(pattern))))
 
 
-def jurisdiction_url_set(profile: dict) -> set[str]:
-    """URLs in the target's own ruleset (reference.lookup) + its regulators.json entry. A citation in here proves
-    the URL belongs to that jurisdiction's curated ruleset — not that the step's content is correct."""
+def target_ruleset(profile: dict) -> tuple[set[str], str]:
+    """URLs in the target's own ruleset (reference.lookup) + its regulators.json entry, and the label for a KB URL
+    outside it. A citation in the set proves the URL belongs to the target's curated ruleset — not that the step's
+    content is correct. When there is no regulated ruleset for this profession here (e.g. the unregulated SWE entry
+    has no URLs), a cited KB URL is labelled "off-ruleset" rather than "off-jurisdiction"; the check is the same."""
     r = lookup(profile["profession"], profile["targetCountry"], profile["targetRegion"])
     compact = json.loads((ROOT / "backend" / "reference" / "regulators.json").read_text())
-    return _urls_in(r) | _urls_in(compact.get(profile["profession"], {}).get(r.get("region_key") or "", {}))
+    urls = _urls_in(r) | _urls_in(compact.get(profile["profession"], {}).get(r.get("region_key") or "", {}))
+    own = bool(urls) and r.get("profession") == profile["profession"] \
+        and not (r.get("unregulated") or r.get("unknown_region"))
+    return urls, "off_jurisdiction" if own else "off_ruleset"
 
 
 # ---------------------------------------------------------------- scoring
@@ -104,27 +109,37 @@ def score_contract(status: int | None, body) -> dict:
     return {"ok": not problems, "problems": problems}
 
 
-def score_grounding(body, kb_urls: set[str], jur_urls: set[str]) -> dict:
-    """sourced = URL is in the target jurisdiction's ruleset; off_jurisdiction = in the KB but another
-    jurisdiction's; off_kb = nowhere in the KB (fabricated); null = uncited."""
-    steps = body.get("steps") if isinstance(body, dict) and isinstance(body.get("steps"), list) else []
-    g = {"steps": 0, "sourced": 0, "off_jurisdiction": 0, "off_kb": 0, "null": 0,
-         "off_jurisdiction_urls": [], "off_kb_urls": []}
+OFF_LABEL = {"off_jurisdiction": "off-jurisdiction", "off_ruleset": "off-ruleset", "off_kb": "off-KB"}
+
+
+def _classify(u, kb_urls: set[str], jur_urls: set[str], off_label: str) -> str:
+    if not u:
+        return "null"
+    if not isinstance(u, str):
+        return "off_kb"
+    n = norm_url(u)
+    return "sourced" if n in jur_urls else off_label if n in kb_urls else "off_kb"
+
+
+def score_grounding(body, kb_urls: set[str], jur_urls: set[str], off_label: str) -> dict:
+    """Per cited URL: sourced = in the target's own ruleset; off_jurisdiction / off_ruleset = in the KB but not the
+    target's ruleset (label from target_ruleset); off_kb = nowhere in the KB (fabricated); null = uncited.
+    regulatorUrl is graded the same way (null allowed) but kept out of the step counts."""
+    b = body if isinstance(body, dict) else {}
+    steps = b["steps"] if isinstance(b.get("steps"), list) else []
+    g = {"steps": 0, "sourced": 0, "off_jurisdiction": 0, "off_ruleset": 0, "off_kb": 0, "null": 0, "bad_urls": []}
     for s in steps:
         if not isinstance(s, dict):
             continue
         g["steps"] += 1
-        u = s.get("sourceUrl")
-        if not u:
-            g["null"] += 1
-        elif norm_url(u) in jur_urls:
-            g["sourced"] += 1
-        elif norm_url(u) in kb_urls:
-            g["off_jurisdiction"] += 1
-            g["off_jurisdiction_urls"].append(u)
-        else:
-            g["off_kb"] += 1
-            g["off_kb_urls"].append(u)
+        k = _classify(s.get("sourceUrl"), kb_urls, jur_urls, off_label)
+        g[k] += 1
+        if k in OFF_LABEL:
+            g["bad_urls"].append(f"{OFF_LABEL[k]} sourceUrl {s['sourceUrl']}")
+    g["regulator_url"] = _classify(b.get("regulatorUrl"), kb_urls, jur_urls, off_label)
+    if g["regulator_url"] in OFF_LABEL:
+        g["bad_urls"].append(f"{OFF_LABEL[g['regulator_url']]} regulatorUrl {b['regulatorUrl']}")
+    g["ok"] = not g["bad_urls"]
     return g
 
 
@@ -163,6 +178,7 @@ def score_semantics(kind: str, body, prior_steps, contract_ok: bool) -> dict:
             for s in steps)
         c["log_says_unregulated"] = bool(UNREGULATED_RE.search(text))
         c["no_regulator"] = body.get("regulator") in (None, "")
+        c["no_regulator_url"] = body.get("regulatorUrl") in (None, "")
     return {"ok": all(c.values()), "checks": c, "problems": [k for k, v in c.items() if not v]}
 
 
@@ -196,36 +212,36 @@ def run(base_url: str, post: Poster, out_dir: Path) -> tuple[dict, Path]:
         status, body = post(base_url.rstrip("/") + "/reason", req)
         ms = round((time.time() - t0) * 1000)
         contract = score_contract(status, body)
-        jur_urls = jurisdiction_url_set(profile)
-        scores = {"contract": contract, "grounding": score_grounding(body, kb_urls, jur_urls),
+        jur_urls, off_label = target_ruleset(profile)
+        scores = {"contract": contract, "grounding": score_grounding(body, kb_urls, jur_urls, off_label),
                   "semantics": score_semantics(kind, body, prior, contract["ok"])}
-        scores["grounding"]["jurisdiction_url_count"] = len(jur_urls)
+        scores["grounding"]["target_ruleset_url_count"] = len(jur_urls)
         no_upstream = bool(steps_from) and not prior
         if no_upstream:
             scores["note"] = f"upstream {steps_from} invalid; sent empty currentSteps"
         rec = {"id": sid, "event": event, "check": kind, "request": req, "http_status": status,
                "elapsed_ms": ms, "response": body, "scores": scores,
                "no_upstream": no_upstream,
-               # a sourceUrl outside the KB is fabricated, one from another jurisdiction's ruleset is mis-grounded:
-               # both fail the scenario (loss-guard #2); a null sourceUrl is honest and only counts as uncited
-               "passed": contract["ok"] and scores["semantics"]["ok"]
-                         and scores["grounding"]["off_kb"] == 0 and scores["grounding"]["off_jurisdiction"] == 0}
+               # a sourceUrl/regulatorUrl outside the KB is fabricated, one outside the target's ruleset is
+               # mis-grounded: both fail the scenario (loss-guard #2); null is honest and only counts as uncited
+               "passed": contract["ok"] and scores["semantics"]["ok"] and scores["grounding"]["ok"]}
         results.append(rec); by_id[sid] = rec
         g = scores["grounding"]
         why = "; ".join(([scores["note"]] if no_upstream else []) + contract["problems"]
-                        + scores["semantics"]["problems"]
-                        + [f"off-jurisdiction sourceUrl {u}" for u in g["off_jurisdiction_urls"]]
-                        + [f"off-KB sourceUrl {u}" for u in g["off_kb_urls"]]) or "ok"
+                        + scores["semantics"]["problems"] + g["bad_urls"]) or "ok"
         print(f"{'PASS' if rec['passed'] else 'FAIL'}  {sid:<16} {event:<18} {ms:>6}ms  "
-              f"sourced {g['sourced']}/{g['steps']} (off-jur {g['off_jurisdiction']}, off-KB {g['off_kb']}, "
-              f"null {g['null']})  {why}")
+              f"sourced {g['sourced']}/{g['steps']} (off-jur {g['off_jurisdiction']}, off-rs {g['off_ruleset']}, "
+              f"off-KB {g['off_kb']}, null {g['null']}; regulatorUrl {g['regulator_url']})  {why}")
 
     n = len(results)
     passed = sum(r["passed"] for r in results)
     valid = sum(r["scores"]["contract"]["ok"] for r in results)
     no_up = sum(r["no_upstream"] for r in results)
-    G = lambda k: sum(r["scores"]["grounding"][k] for r in results)  # noqa: E731
-    steps, sourced, off_jur, off_kb, null = G("steps"), G("sourced"), G("off_jurisdiction"), G("off_kb"), G("null")
+    V = [r for r in results if r["scores"]["contract"]["ok"]]  # grounding totals: contract-valid responses only
+    G = lambda k: sum(r["scores"]["grounding"][k] for r in V)  # noqa: E731
+    steps, sourced, off_jur, off_rs, off_kb, null = (
+        G(k) for k in ("steps", "sourced", "off_jurisdiction", "off_ruleset", "off_kb", "null"))
+    reg_bad = sum(r["scores"]["grounding"]["regulator_url"] in OFF_LABEL for r in V)
     judged = [r for r in results if r["check"] in ("delay", "rejection", "unregulated")]
     flagged = [r for r in results if r["check"] in ("build", "reset")]
     j_ok = sum(r["scores"]["semantics"]["ok"] for r in judged)
@@ -233,14 +249,18 @@ def run(base_url: str, post: Poster, out_dir: Path) -> tuple[dict, Path]:
     pct = f"{round(100 * sourced / steps)}%" if steps else "n/a"
     cited = steps - null
     line = (f"{passed}/{n} scenarios passed all checks · {valid}/{n} contract-valid · sourced {pct} "
-            f"({sourced}/{steps} steps cite a URL from the target jurisdiction's curated ruleset; "
-            f"{off_jur} off-jurisdiction, {off_kb} off-KB, {null} uncited) · "
+            f"({sourced}/{steps} steps in contract-valid responses cite a URL from the target jurisdiction's curated "
+            f"ruleset; {off_jur} off-jurisdiction, {off_rs} off-ruleset, {off_kb} off-KB, {null} uncited) · "
             f"delay/rejection/unregulated judgments {j_ok}/{len(judged)} · build/reset flag=false {f_ok}/{len(flagged)}"
+            + (f" · {reg_bad} regulatorUrl outside the target's ruleset" if reg_bad else "")
             + (f" · {no_up} dependents ran without upstream steps" if no_up else ""))
-    warning = (f"WARNING: only {pct} of steps cite a URL from the target jurisdiction's ruleset (<50%); "
-               f"do not publish this as an accuracy number" if not steps or sourced / steps < 0.5 else None)
+    publish = "do not publish this as an accuracy number"
+    warning = (f"WARNING: no steps returned by contract-valid responses; {publish}" if not steps else
+               f"WARNING: only {pct} of steps cite a URL from the target jurisdiction's ruleset (<50%); {publish}"
+               if sourced / steps < 0.5 else None)
     totals = {"scenarios": n, "passed": passed, "valid": valid, "steps": steps, "sourced": sourced,
-              "off_jurisdiction": off_jur, "off_kb": off_kb, "null": null, "dependents_without_upstream": no_up,
+              "off_jurisdiction": off_jur, "off_ruleset": off_rs, "off_kb": off_kb, "null": null,
+              "regulator_url_bad": reg_bad, "dependents_without_upstream": no_up,
               "sourced_rate_all_steps": round(sourced / steps, 4) if steps else None,
               "sourced_rate_cited_steps": round(sourced / cited, 4) if cited else None,
               "judgments_ok": j_ok, "judgments": len(judged), "flag_checks_ok": f_ok, "flag_checks": len(flagged)}
@@ -300,8 +320,10 @@ def stub_bad(req: dict) -> dict:
     contract-valid so delay/rejection receive real currentSteps and are judged on their own defect."""
     r, prof, ev = stub_good(req), req["profile"], req["event"]
     region = prof["targetRegion"]
-    if prof["profession"] == "Software Engineer":                       # templated licensing path
+    if prof["profession"] == "Software Engineer":                       # templated licensing path, citing a
+        civil = _ruleset({**WEI, "profession": "Civil Engineer"})       # KB URL from another profession's ruleset
         r["steps"] = _renumber(r["steps"] + [{**r["steps"][0], "title": "Licensing exam"}] * 3)
+        r["steps"][0]["sourceUrl"] = civil["source"]
         r["logEntry"]["text"] = "Pathway built."
     elif ev == "build_pathway" and region == "Ontario":                 # build must not flag
         r["logEntry"]["flag"] = True
@@ -331,6 +353,10 @@ def stub_bad_chain(req: dict) -> dict:
     elif ev == "simulate_delay" and not req.get("currentSteps"):        # re-plans a pathway it never received
         r["steps"][1]["status"] = "at-risk"
         r["logEntry"] = {"flag": True, "text": "Language result expires 2026-11-02, before the registration decision."}
+    elif prof["targetCountry"] == "Germany":                            # invented regulator + fabricated URL
+        r["regulator"], r["regulatorUrl"] = "stub-invented-regulator", "https://example.invalid/invented-regulator"
+    elif prof["targetRegion"] == "New York":                            # Ontario's regulator URL on a NY plan
+        r["regulatorUrl"] = _ruleset(AIDA)["source"]
     return r
 
 
@@ -351,13 +377,21 @@ def self_test(out_dir: Path) -> int:
     uncited = lambda q: {**stub_good(q), "steps": [{**s, "sourceUrl": None} for s in stub_good(q)["steps"]]}  # noqa: E731
     low, lp = run("stub://uncited", local(uncited), out_dir)
     print(low["warning"]); print(low["summary_line"]); print(f"-> {lp}")
+    print("== all-invalid stub (0/7 valid: grounding must not be counted) ==")
+    def all_invalid(q):
+        r = stub_good(q)
+        return {**r, "steps": [{**s, "status": "done"} for s in r["steps"]]}
+    inv, ip = run("stub://all-invalid", local(all_invalid), out_dir)
+    print(inv["warning"]); print(inv["summary_line"]); print(f"-> {ip}")
     expect = {  # scenario -> the specific check that must fail
         "rn-on-build": lambda r: r["scores"]["semantics"]["problems"] == ["flag_false"],
         "rn-on-delay": lambda r: r["scores"]["semantics"]["problems"] == ["flag_true", "has_at_risk", "log_has_iso_date"],
         "rn-on-rejection": lambda r: r["scores"]["semantics"]["problems"] == ["remediation_step"],
         "rn-on-reset": lambda r: any("ids not 1..n" in p for p in r["scores"]["contract"]["problems"]),
         "swe-on-build": lambda r: {"2_to_4_steps", "no_exam_or_licence_step", "log_says_unregulated"}
-                                  <= set(r["scores"]["semantics"]["problems"]),
+                                  <= set(r["scores"]["semantics"]["problems"])
+                                  and r["scores"]["grounding"]["off_ruleset"] == 1
+                                  and r["scores"]["grounding"]["off_jurisdiction"] == 0,
         "rn-de-build": lambda r: r["scores"]["grounding"]["off_kb"] == 1,
         "rn-ny-build": lambda r: r["scores"]["grounding"]["off_jurisdiction"] >= 1 and r["scores"]["contract"]["ok"]
                                  and r["scores"]["semantics"]["ok"],
@@ -367,11 +401,22 @@ def self_test(out_dir: Path) -> int:
         "rn-on-delay": lambda r: r["no_upstream"] and r["scores"]["semantics"]["problems"] == ["had_prior_steps"],
         "rn-on-rejection": lambda r: r["no_upstream"] and not r["passed"],
         "swe-on-build": lambda r: r["scores"]["semantics"]["problems"] == ["no_regulator"],
+        # regulatorUrl is the only defect: contract + semantics + step citations all clean, scenario still fails
+        "rn-de-build": lambda r: r["scores"]["grounding"]["regulator_url"] == "off_kb" and not r["passed"]
+                                 and r["scores"]["semantics"]["ok"] and r["scores"]["grounding"]["off_kb"] == 0,
+        "rn-ny-build": lambda r: r["scores"]["grounding"]["regulator_url"] == "off_jurisdiction" and not r["passed"]
+                                 and r["scores"]["semantics"]["ok"] and r["scores"]["grounding"]["off_jurisdiction"] == 0,
     }
     fails = []
     t = good["totals"]
-    if not good["all_passed"] or t["off_kb"] or t["off_jurisdiction"] or good["warning"]:
+    if not good["all_passed"] or t["off_kb"] or t["off_jurisdiction"] or t["off_ruleset"] or t["regulator_url_bad"] \
+            or good["warning"] or any(r["scores"]["grounding"]["regulator_url"] not in ("sourced", "null")
+                                      for r in good["scenarios"]):
         fails.append("good stub did not pass cleanly")
+    it = inv["totals"]
+    if not (it["valid"] == 0 and it["steps"] == 0 and "sourced n/a" in inv["summary_line"]
+            and (inv["warning"] or "").startswith("WARNING: no steps returned")):
+        fails.append("all-invalid stub: grounding counted over invalid responses, or warning text wrong")
     if not good["summary_line"].startswith("7/7 scenarios passed all checks"):
         fails.append("summary line must lead with passed-all-checks")
     fails += [f"bad stub: {sid} defect not caught" for sid, ok in expect.items() if not ok(got[sid])]
