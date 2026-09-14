@@ -7,7 +7,8 @@ You do not fix anything. You verify one task's diff and return a verdict.
 
 Run, from the repo root (use backend/.venv/bin/python if it exists):
 1. `python backend/tests_smoke.py` — must print ALL SMOKE CHECKS PASSED.
-2. `python kb/pipeline/build_kb_index.py` — must not print KB VALIDATION FAILED.
+2. `python -c "import sys; sys.path.insert(0,'.'); from kb.pipeline import kb_store; e=kb_store.validate_all(); print(e or 'KB OK'); sys.exit(bool(e))"` — must print KB OK.
+   (Do NOT run build_kb_index.py: it rewrites kb/store/_index.json and you are read-only.)
 3. `python -m py_compile` on every changed .py file.
 4. `git diff` for the task's files, and judge against CLAUDE.md's loss-guards:
    - Contract drift: any change to backend/app/schemas.py that removes/renames a field or makes one required → FAIL.
