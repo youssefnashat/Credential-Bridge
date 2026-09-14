@@ -1,0 +1,114 @@
+== invoke
+
+⚠️ Recommendation: The Starter Toolkit CLI is no longer supported.
+   Please use the AgentCore CLI (@aws/agentcore) to create, develop, and deploy 
+agents on Amazon Bedrock AgentCore.
+   New Bedrock AgentCore features are only accessible in the AgentCore CLI.
+
+   To uninstall this starter toolkit, run: pip uninstall 
+bedrock-agentcore-starter-toolkit
+   To install the AgentCore CLI: npm install -g @aws/agentcore
+   To import existing agents, run: agentcore import
+   Set AGENTCORE_SUPPRESS_RECOMMENDATION=1 to silence this warning.
+
+╭───────────────────────────── credential_bridge ──────────────────────────────╮
+│ Session: d827289e-d2ed-4425-b41d-f5131dfeb799                                │
+│ Request ID: 8fd0ee35-537e-4e1c-8ad0-042c07acd7bb                             │
+│ ARN:                                                                         │
+│ arn:aws:bedrock-agentcore:us-west-2:<acct>:runtime/credential_bridge-e │
+│ 26XhDBSw0                                                                    │
+│ Logs: aws logs tail                                                          │
+│ /aws/bedrock-agentcore/runtimes/credential_bridge-e26XhDBSw0-DEFAULT         │
+│ --log-stream-name-prefix "2026/09/14/[runtime-logs" --follow                 │
+│       aws logs tail                                                          │
+│ /aws/bedrock-agentcore/runtimes/credential_bridge-e26XhDBSw0-DEFAULT         │
+│ --log-stream-name-prefix "2026/09/14/[runtime-logs" --since 1h               │
+│ GenAI Dashboard:                                                             │
+│ https://console.aws.amazon.com/cloudwatch/home?region=us-west-2#gen-ai-obser │
+│ vability/agent-core                                                          │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
+Response:
+{"steps": [{"id": 1, "title": "Gather & Notarize Philippine Nursing Documents", 
+"status": "in-progress", "detail": "Collect all required source documents: PRC 
+nursing licence (original + certified true copy), PRC Board Rating, official 
+university transcripts, and diploma — all authenticated/apostilled by the 
+Philippine Department of Foreign Affairs (DFA). Also obtain a Certificate of 
+Good Standing from the Philippine Regulatory Commission (PRC). Allow 4–8 weeks 
+for DFA apostille processing. Target completion: 2026-11-14.", "source": 
+"College of Nurses of Ontario (CNO)", "sourceUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}, {"id":
+2, "title": "Educational Credential Assessment (ECA) via CNO-Approved Provider",
+"status": "upcoming", "detail": "Submit apostilled documents to a CNO-approved 
+ECA provider — WES, ICAS, or ICES-BCIT (or a CGFNS/TruMerit NNAS expedited 
+report). CNO requires the ECA report to arrive at CNO before you apply for 
+registration. Processing typically takes 3–5 months. Estimated submission: 
+2026-11-14; estimated ECA report received by CNO: 2027-04-14. There is no stated
+expiry on the ECA report itself, but it must be on file at CNO prior to your 
+registration application.", "source": "College of Nurses of Ontario (CNO)", 
+"sourceUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}, {"id":
+3, "title": "English Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+"status": "upcoming", "detail": "Write one of the three CNO-accepted tests: 
+IELTS Academic, CELBAN, or OET. CRITICAL: results must be VALID (within 24 
+months) at the time CNO makes its registration decision — not merely at the time
+of application. Plan to sit the test no earlier than is needed to stay within 
+that window. If you sit in 2027-04-14 (aligned with ECA completion), results are
+valid until 2029-04-14, comfortably covering the registration decision. Book 
+well in advance; CELBAN wait times can be 2–3 months in Ontario.", "source": 
+"College of Nurses of Ontario (CNO)", "sourceUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}, {"id":
+4, "title": "Apply for CNO Registration (General Class)", "status": 
+"not-started", "detail": "Once the ECA report is on file at CNO AND a valid 
+language test result is in hand, submit your CNO online registration 
+application. Include all required documents: ECA report confirmation, language 
+test results, PRC licence details, and good-standing certificate. CNO reviews 
+applications and may request additional information; review typically takes 4–8 
+weeks. Estimated application submission: 2027-05-14; estimated CNO registration 
+decision: 2027-07-14.", "source": "College of Nurses of Ontario (CNO)", 
+"sourceUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}, {"id":
+5, "title": "Receive CNO Authorization to Test (ATT) for NCLEX-RN", "status": 
+"not-started", "detail": "Upon a successful registration review, CNO issues an 
+Authorization to Test (ATT) granting eligibility to sit the NCLEX-RN. The ATT is
+time-limited (typically 365 days). Estimated ATT receipt: 2027-07-14. You must 
+book and write the NCLEX-RN before the ATT expires (no later than 2028-07-14).",
+"source": "College of Nurses of Ontario (CNO)", "sourceUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}, {"id":
+6, "title": "Prepare for & Write the NCLEX-RN", "status": "not-started", 
+"detail": "Register with Pearson VUE and schedule the NCLEX-RN at an Ontario 
+test centre. Allow 8–12 weeks of dedicated preparation (review resources: 
+UWorld, Archer, official NCSBN practice tests). Recommended exam date: 
+2027-10-14 (within ATT window). Results are typically available within 6 weeks 
+via the quick-results service. The NCLEX-RN is the final licensing exam required
+by CNO for full general-class registration.", "source": "College of Nurses of 
+Ontario (CNO)", "sourceUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}, {"id":
+7, "title": "Obtain CNO Certificate of Registration & Begin Practice", "status":
+"not-started", "detail": "After passing the NCLEX-RN, CNO issues the Certificate
+of Registration (General Class). Estimated certificate date: 2027-12-14. At this
+point Aida is fully licensed to practise as an RN in Ontario. Maintain 
+registration annually: pay renewal fees, complete CNO's Quality Assurance 
+program (including a Professional Portfolio), and ensure any future language 
+test results remain valid if CNO requests re-verification.", "source": "College 
+of Nurses of Ontario (CNO)", "sourceUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}], 
+"logEntry": {"text": "Pathway built for Aida Torres — Registered Nurse 
+(Philippines → Ontario, Canada). The regulator is the College of Nurses of 
+Ontario (CNO). The pathway has 7 ordered steps with the following critical 
+dependencies: (1) DFA-apostilled Philippine documents must be ready before the 
+ECA can be submitted; (2) the CNO-approved ECA report must be ON FILE at CNO 
+before the registration application is accepted; (3) the language test result 
+(IELTS Academic, CELBAN, or OET) must still be VALID — within the 24-month 
+window — at the time CNO issues its registration decision, not merely at 
+application; (4) CNO must issue an Authorization to Test (ATT) before Aida can 
+sit the NCLEX-RN. Estimated realistic timeline from today (2026-09-14) to full 
+licensure: approximately 15 months, with a target Certificate of Registration 
+date of 2027-12-14. The biggest scheduling risk is language-test expiry: if Aida
+sits the test too early (before ~2026-12-14), results could expire before CNO's 
+registration decision. The recommended strategy is to sit the language test 
+around 2027-04-14, keeping validity running to 2029-04-14 and well clear of the 
+registration decision window. No experience hours are required by CNO prior to 
+first registration in Ontario.", "flag": false}, "regulator": "College of Nurses
+of Ontario (CNO)", "regulatorUrl": 
+"https://www.cno.org/become-a-nurse/registration-guides/outside-canada"}
