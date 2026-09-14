@@ -92,6 +92,14 @@ def _test_orchestration():
             "event":"build_pathway","currentSteps":[]})
         jobs.append((f"sess-{i}", r))
     res = o.handle_many(jobs); o.shutdown()
+    seen = []
+    def check_reason(req, agent=None):
+        seen.extend(type(x).__name__ for x in req.currentSteps)
+        return fake_reason(req, agent)
+    orch_mod.reason = check_reason
+    o.handle("sess-0", jobs[0][1])   # second event: steps are seeded from the stored session
+    assert seen and set(seen) == {"Step"}, f"seeded steps must be Step models, got {seen}"
+    print("OK  session seeding restores Step models")
     assert len(res) == 6, "expected 6 concurrent results"
     from app.orchestration import session_store
     assert len(session_store.list_sessions()) >= 6

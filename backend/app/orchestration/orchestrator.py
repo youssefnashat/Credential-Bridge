@@ -11,7 +11,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import Iterable
 
-from app.schemas import ReasonRequest, ReasonResponse
+from app.schemas import ReasonRequest, ReasonResponse, Step
 from app.agent import build_agent, reason
 from app.orchestration import session_store
 
@@ -28,7 +28,7 @@ class Orchestrator:
         if not req.currentSteps:
             prior = session_store.load(session_id).get("steps", [])
             if prior:
-                req = req.model_copy(update={"currentSteps": prior})
+                req = req.model_copy(update={"currentSteps": [Step.model_validate(x) for x in prior]})  # stored as dicts
         resp = reason(req, agent=self._agent)
         def _mut(state):
             state["profile"] = req.profile.model_dump()
