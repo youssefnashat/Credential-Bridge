@@ -1,4 +1,4 @@
-# Recording script — Credential Bridge (target 4:20, hard limit 5:00)
+# Recording script — Credential Bridge (target 4:25, hard limit 5:00)
 
 Devpost requires: a public YouTube/Vimeo video ≤ 5 min that shows the project **working** and pitches
 **(1) the problem, (2) who it's for, (3) why it matters**. Every section below is tagged with what it covers.
@@ -16,7 +16,7 @@ Detailed beat plan + command sheet: `docs/VIDEO_SCRIPT.md`.
 
 ---
 
-## Part 1 — Slides 1–5 (0:00–1:00)
+## Part 1 — Slides 1–5 (0:00–1:05)
 
 **Slide 1 · Title** (0:00–0:08)
 > "This is Credential Bridge — an AI agent that maps the licensing pathway for internationally trained professionals. Built with the Strands Agents SDK for the Agents for Humans hackathon, Good Neighbor track."
@@ -35,9 +35,9 @@ Detailed beat plan + command sheet: `docs/VIDEO_SCRIPT.md`.
 
 ---
 
-## Part 2 — The live app (1:00–3:40) · shows it **working**
+## Part 2 — The live app (1:05–3:45) · shows it **working**
 
-**Build the pathway** (1:00–1:50) — *speed up the wait*
+**Build the pathway** (1:05–1:55) — *speed up the wait*
 Fill in: Aida Torres · Registered Nurse · trained in Philippines · Canada · Ontario → **Build pathway**.
 > "The agent first calls its grounding tool — a knowledge base of real regulator rules — and then builds her pathway in order."
 
@@ -46,7 +46,7 @@ When it loads: scroll the steps, hover or click one **source ↗** link, point a
 
 *[read from screen]* the first sentence of the **Agent reasoning** entry (e.g. its timeline estimate).
 
-**Simulate a schedule delay** (1:50–2:40) — *speed up the wait*
+**Simulate a schedule delay** (1:55–2:45) — *speed up the wait*
 > "Now something goes wrong: her schedule slips."
 
 Point at the steps marked **at-risk**.
@@ -55,30 +55,30 @@ Point at the steps marked **at-risk**.
 *[read from screen]* the conflict and the recommendation in the log. (In the dry run it was the six-month police check expiring before the College's registration decision.)
 > "A checklist would show both of those as fine. The agent catches it, with the actual dates, and says what to do."
 
-**Simulate a document rejection** (2:40–3:00)
+**Simulate a document rejection** (2:45–3:05)
 > "If a document is rejected, the agent inserts a remediation step right after it and holds everything that depends on it."
 
-**Unregulated profession** (3:00–3:30)
+**Unregulated profession** (3:05–3:35)
 New case: Wei Chen · Software Engineer · trained in China · Canada · Ontario → **Build pathway**.
 > "Now a software engineer. There's no licence to get for this in Ontario — and the agent says so instead of forcing a licensing template on him. It gives a short work-authorization path. That's judgment, not a form."
 
-**Optional — many cases at once** (3:30–3:40), terminal:
+**Optional — many cases at once** (3:35–3:45), terminal:
 `cd backend && CREDBRIDGE_URL=http://localhost:8010 .venv/bin/python demo_concurrent.py`
 > "An agency runs many cases at once — here are five caseworker cases running in parallel, each saved separately."
 
 ---
 
-## Part 3 — Slides 6, 8, 9 (3:40–4:20)
+## Part 3 — Slides 6, 8, 9 (3:45–4:25)
 
-**Slide 6 · How it works** (3:40–4:00)
+**Slide 6 · How it works** (3:45–4:05)
 > "Under the hood: a Strands agent running Claude, with three tools — a knowledge base of real regulator rules across seven jurisdictions, and date math for expiry windows. Regulator names and source links are enforced in code, so the model can't invent them. The same agent is deployed on Amazon Bedrock AgentCore Runtime."
 
 *(Slide 7 · Judgment is optional — skip it if you're over time.)*
 
-**Slide 8 · Results** (4:00–4:15)
+**Slide 8 · Results** (4:05–4:20)
 > "In our live evaluation on Amazon Bedrock it passed seven of seven scenarios, and ninety-five percent of steps cite the right regulator's own rules — with zero invented sources. For this recording it runs on the Claude API; the code is the same."
 
-**Slide 9 · Close** (4:15–4:20)
+**Slide 9 · Close** (4:20–4:25)
 > "Credential Bridge — restoring professional dignity to newcomers, and helping them get back to the work they trained for. The code is open source on GitHub."
 
 ---
