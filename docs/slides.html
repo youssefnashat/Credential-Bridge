@@ -1,0 +1,332 @@
+<title>Credential Bridge Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400..700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Single light theme on purpose: the deck is cut next to the app on camera and uses its tokens. */
+  :root {
+    --paper: #F3F5F1; --paper-deep: #E9EDE6; --surface: #FCFDFB;
+    --ink: #1E2A32; --ink-2: #4E5D65; --ink-3: #7C8A90;
+    --rule: #DCE2D9; --rule-strong: #C3CCBF;
+    --teal: #2F6F62; --teal-deep: #245448; --teal-soft: #E3EDE8;
+    --amber: #B9791F; --amber-soft: #F6EBD8;
+    --rust: #A8422F; --rust-soft: #F4E2DD;
+    --sans: "IBM Plex Sans", ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+    --serif: "Fraunces", ui-serif, Georgia, "Times New Roman", serif;
+    --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Consolas, monospace;
+    color-scheme: light;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; padding-inline: 16px; background: #DDE3DA; color: var(--ink);
+    font-family: var(--sans); overflow: hidden;
+    display: grid; place-items: center;
+  }
+  .viewport { width: 1600px; height: 900px; transform-origin: center center; flex: none; }
+  .slide {
+    position: absolute; inset: 0; width: 1600px; height: 900px;
+    background: var(--paper); padding: 88px 112px 96px;
+    display: none; flex-direction: column; gap: 40px;
+    box-shadow: 0 24px 60px rgba(30, 42, 50, .14);
+  }
+  .slide.is-active { display: flex; }
+  @media (prefers-reduced-motion: no-preference) {
+    .slide.is-active { animation: arrive .35s ease-out; }
+    @keyframes arrive { from { opacity: .4; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  }
+
+  /* type scale: 104 / 64 / 44 / 30 / 24 / 18 */
+  .eyebrow { font: 500 18px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--teal); }
+  h1, h2, h3 { font-family: var(--serif); font-weight: 500; margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+  h1 { font-size: 104px; line-height: 1; font-variation-settings: "opsz" 144; }
+  h2 { font-size: 64px; line-height: 1.08; max-width: 22ch; font-variation-settings: "opsz" 120; }
+  h3 { font-size: 30px; line-height: 1.2; }
+  p { margin: 0; }
+  .lede { font-size: 30px; line-height: 1.4; color: var(--ink-2); max-width: 38ch; }
+  .body { font-size: 24px; line-height: 1.5; color: var(--ink-2); max-width: 44ch; }
+  .mono { font-family: var(--mono); }
+  .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: baseline;
+          font: 400 18px/1.4 var(--mono); color: var(--ink-3); border-top: 1px solid var(--rule); padding-top: 20px; }
+  em.k { font-style: normal; color: var(--rust); }
+
+  /* the product's own object: a pathway step with a status chip */
+  .chip { display: inline-flex; align-items: center; gap: 8px; padding: 5px 10px; border-radius: 4px;
+          font: 500 15px/1 var(--mono); letter-spacing: .04em; text-transform: lowercase; white-space: nowrap; }
+  .chip::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .c-complete { background: var(--teal-soft); color: var(--teal-deep); }
+  .c-progress { background: var(--amber-soft); color: var(--amber); }
+  .c-upcoming { background: var(--paper-deep); color: var(--ink-3); }
+  .c-risk     { background: var(--rust-soft); color: var(--rust); }
+  .step { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 18px 20px;
+          display: grid; gap: 10px; align-content: start; }
+  .step .n { font: 500 15px/1 var(--mono); color: var(--ink-3); }
+  .step .t { font-size: 21px; line-height: 1.25; font-weight: 500; color: var(--ink); }
+  .step .m { font: 400 15px/1.35 var(--mono); color: var(--ink-3); }
+  .step.risk { border-color: var(--rust); background: #FFF9F7; }
+  .step.risk .m { color: var(--rust); }
+
+  /* 1 title */
+  .title-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 72px; align-items: center; flex: 1; }
+  .title-grid .left { display: grid; gap: 32px; }
+  .rail { display: grid; gap: 14px; position: relative; padding-left: 28px; }
+  .rail::before { content: ""; position: absolute; left: 7px; top: 18px; bottom: 18px; width: 2px; background: var(--rule-strong); }
+  .rail .step { position: relative; }
+  .rail .step::before { content: ""; position: absolute; left: -27px; top: 22px; width: 12px; height: 12px;
+                        border-radius: 50%; background: var(--paper); border: 2px solid var(--rule-strong); }
+  .rail .step.done::before { background: var(--teal); border-color: var(--teal); }
+  .rail .step .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+
+  /* 2 problem */
+  .maze { display: grid; grid-template-columns: repeat(9, 1fr); gap: 12px; }
+  .maze .step { min-height: 176px; padding: 16px; }
+  .maze .step .t { font-size: 18px; }
+  .maze .step .m { font-size: 13px; }
+
+  /* 3 audiences, 4 why */
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; flex: 1; align-content: start; }
+  .who { border-top: 3px solid var(--teal); padding-top: 28px; display: grid; gap: 16px; }
+  .who.cw { border-top-color: var(--amber); }
+  .who .role { font: 500 16px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .who h3 { font-size: 44px; }
+  .reasons { display: grid; gap: 28px; max-width: 1180px; }
+  .reason { display: grid; grid-template-columns: 300px 1fr; gap: 40px; align-items: baseline;
+            border-top: 1px solid var(--rule); padding-top: 24px; }
+  .reason h3 { color: var(--teal-deep); }
+
+  /* 5 demo */
+  .demo { flex: 1; display: grid; align-content: center; gap: 36px; }
+  .case { display: flex; gap: 18px; flex-wrap: wrap; font: 500 30px/1.2 var(--sans); color: var(--ink); }
+  .case span + span::before { content: "·"; margin-right: 18px; color: var(--ink-3); }
+  .events { display: flex; gap: 14px; flex-wrap: wrap; }
+  .events .chip { font-size: 18px; padding: 8px 14px; }
+
+  /* 6 how it works */
+  .flow { display: grid; grid-template-columns: 1fr 48px 1.25fr 48px 1fr; align-items: stretch; }
+  .flow .arrow { display: grid; place-items: center; color: var(--rule-strong); font: 400 34px/1 var(--mono); }
+  .box { background: var(--surface); border: 1px solid var(--rule); border-radius: 4px; padding: 28px; display: grid; gap: 14px; align-content: start; }
+  .box.agent { border-color: var(--teal); box-shadow: 0 0 0 4px var(--teal-soft); }
+  .box .lbl { font: 500 15px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); }
+  .box p { font-size: 21px; line-height: 1.45; color: var(--ink-2); }
+  .tools { display: grid; gap: 8px; }
+  .tools code { font: 500 17px/1.2 var(--mono); color: var(--teal-deep); background: var(--teal-soft);
+                padding: 7px 10px; border-radius: 4px; justify-self: start; }
+  .notes { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; }
+  .note { display: grid; gap: 8px; }
+  .note b { font: 600 16px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink); }
+  .note p { font-size: 21px; line-height: 1.45; color: var(--ink-2); }
+
+  /* 7 judgment */
+  .judg { display: grid; grid-template-columns: 1fr 1.35fr 1fr; gap: 28px; flex: 1; }
+  .j { display: grid; gap: 14px; align-content: start; border-top: 3px solid var(--teal); padding-top: 22px; }
+  .j.mid { border-top-color: var(--rust); }
+  .j p { font-size: 21px; line-height: 1.45; color: var(--ink-2); }
+  .clock { position: relative; height: 120px; margin-top: 8px; }
+  .clock .track { position: absolute; left: 0; right: 0; top: 50px; height: 2px; background: var(--rule-strong); }
+  .clock .valid { position: absolute; left: 0; width: 58%; top: 44px; height: 14px; border-radius: 3px; background: var(--rust-soft); border: 1px solid var(--rust); }
+  .clock .mk { position: absolute; top: 0; font: 500 14px/1.3 var(--mono); color: var(--ink-3); white-space: nowrap; }
+  .clock .mk.end { left: 58%; transform: translateX(-50%); color: var(--rust); }
+  .clock .mk.dec { right: 0; text-align: right; color: var(--ink); }
+  .clock .tick { position: absolute; top: 36px; width: 2px; height: 30px; background: var(--ink); }
+  .clock .cap { position: absolute; top: 76px; font: 400 14px/1.3 var(--mono); color: var(--ink-3); }
+
+  /* 8 results */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; border-top: 1px solid var(--rule-strong); }
+  .stat { padding: 32px 36px 32px 0; display: grid; gap: 12px; align-content: start; }
+  .stat + .stat { padding-left: 36px; border-left: 1px solid var(--rule); }
+  .stat .v { font: 500 112px/1 var(--serif); font-variation-settings: "opsz" 144; color: var(--teal-deep); font-variant-numeric: tabular-nums; }
+  .stat .v small { font-size: 52px; }
+  .stat p { font-size: 22px; line-height: 1.45; color: var(--ink-2); }
+  .deployed { display: flex; gap: 16px; align-items: center; font-size: 24px; color: var(--ink); }
+
+  /* 9 end */
+  .end { flex: 1; display: grid; align-content: center; gap: 36px; }
+  .end h2 { max-width: 20ch; }
+  .repo { font: 500 26px/1.3 var(--mono); color: var(--teal-deep); }
+
+  /* controls */
+  .hud { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); display: flex; gap: 6px; z-index: 5; }
+  .hud button { width: 30px; height: 6px; border: 0; padding: 0; border-radius: 3px; background: rgba(30,42,50,.18); cursor: pointer; }
+  .hud button[aria-current="true"] { background: var(--teal); }
+  .hud button:focus-visible { outline: 2px solid var(--teal); outline-offset: 3px; }
+  body.clean .hud { display: none; }
+  .hint { position: fixed; right: 18px; bottom: 10px; font: 400 12px/1 var(--mono); color: #6B7980; }
+  body.clean .hint { display: none; }
+</style>
+
+<div class="viewport" id="viewport">
+
+  <!-- 1 · Title -->
+  <section class="slide" aria-label="Title">
+    <div class="eyebrow">Agents for Humans · Good Neighbor track</div>
+    <div class="title-grid">
+      <div class="left">
+        <h1>Credential Bridge</h1>
+        <p class="lede">A licensing pathway navigator for internationally trained professionals — and the caseworkers who guide them.</p>
+      </div>
+      <div class="rail" aria-hidden="true">
+        <div class="step done"><div class="row"><span class="t">Educational credential assessment</span><span class="chip c-complete">complete</span></div><span class="m">WES · ICAS · ICES-BCIT</span></div>
+        <div class="step"><div class="row"><span class="t">Language test</span><span class="chip c-progress">in progress</span></div><span class="m">valid 24 mo · at registration decision</span></div>
+        <div class="step"><div class="row"><span class="t">NCLEX-RN</span><span class="chip c-upcoming">upcoming</span></div><span class="m">after CNO eligibility</span></div>
+      </div>
+    </div>
+    <div class="foot"><span>Youssef Nashat · Kanwar Jhattu</span><span>Built with the Strands Agents SDK</span></div>
+  </section>
+
+  <!-- 2 · Problem -->
+  <section class="slide" aria-label="The problem">
+    <div class="eyebrow">The problem · The licensing maze</div>
+    <h2>Before Aida can work as a nurse in Ontario, she has nine steps to clear — in order, before things expire.</h2>
+    <div class="maze">
+      <div class="step"><span class="n">1</span><span class="t">Credential assessment</span><span class="m">WES / ICAS / ICES</span></div>
+      <div class="step"><span class="n">2</span><span class="t">Language test</span><span class="m">IELTS · CELBAN · OET<br>valid 24 mo</span></div>
+      <div class="step"><span class="n">3</span><span class="t">CNO application</span><span class="m">after assessment</span></div>
+      <div class="step"><span class="n">4</span><span class="t">Jurisprudence exam</span><span class="m">once confirmed as applicant</span></div>
+      <div class="step"><span class="n">5</span><span class="t">NCLEX-RN</span><span class="m">national exam</span></div>
+      <div class="step"><span class="n">6</span><span class="t">Transition to practice</span><span class="m">valid 60 mo</span></div>
+      <div class="step"><span class="n">7</span><span class="t">Evidence of practice</span><span class="m">within 36 mo</span></div>
+      <div class="step"><span class="n">8</span><span class="t">Authorization to work</span><span class="m">unexpired when sent</span></div>
+      <div class="step risk"><span class="n">9</span><span class="t">Police record check</span><span class="m">expires 6 mo after issue</span></div>
+    </div>
+    <p class="body">The order and the expiry windows change by profession and by province. <em class="k">One expired document can send her back months.</em></p>
+    <div class="foot"><span>Ontario RN requirements · College of Nurses of Ontario (cno.org)</span><span>2</span></div>
+  </section>
+
+  <!-- 3 · Who -->
+  <section class="slide" aria-label="Who it's for">
+    <div class="eyebrow">Who it's for</div>
+    <h2>Two people, one pathway.</h2>
+    <div class="pair">
+      <div class="who"><span class="role">The applicant</span><h3>A skilled newcomer</h3><p class="body">Trained as a nurse, engineer or teacher abroad — trying to get back to the profession they already practise.</p></div>
+      <div class="who cw"><span class="role">The caseworker</span><h3>Settlement &amp; nonprofit staff</h3><p class="body">Guiding dozens of these cases at once, mostly by hand, from checklists that don't know about expiry dates.</p></div>
+    </div>
+    <div class="foot"><span>Good Neighbor: tools for the organizations that help groups of people</span><span>3</span></div>
+  </section>
+
+  <!-- 4 · Why -->
+  <section class="slide" aria-label="Why it matters">
+    <div class="eyebrow">Why it matters</div>
+    <h2>Unlocking expertise we're already wasting.</h2>
+    <div class="reasons">
+      <div class="reason"><h3>Shortage professions</h3><p class="body">Nursing, engineering and teaching are exactly the fields where qualified newcomers wait longest.</p></div>
+      <div class="reason"><h3>Months lost</h3><p class="body">Every month stuck in paperwork is a month a qualified nurse isn't working as one.</p></div>
+      <div class="reason"><h3>More people helped</h3><p class="body">A correct pathway, checked for conflicts, lets one caseworker carry more cases without cutting corners.</p></div>
+    </div>
+    <div class="foot"><span>Credential Bridge</span><span>4</span></div>
+  </section>
+
+  <!-- 5 · Demo -->
+  <section class="slide" aria-label="Live demo">
+    <div class="eyebrow">Live demo</div>
+    <div class="demo">
+      <h2>Let's run a real case.</h2>
+      <div class="case"><span>Aida Torres</span><span>Registered Nurse</span><span>Philippines → Ontario</span></div>
+      <div class="events">
+        <span class="chip c-complete">build pathway</span>
+        <span class="chip c-risk">simulate delay</span>
+        <span class="chip c-progress">simulate rejection</span>
+        <span class="chip c-upcoming">software engineer · unregulated</span>
+      </div>
+    </div>
+    <div class="foot"><span>Every step on screen comes from the agent — POST /reason</span><span>5</span></div>
+  </section>
+
+  <!-- 6 · How it works -->
+  <section class="slide" aria-label="How it works">
+    <div class="eyebrow">How it works</div>
+    <h2>An agent that reads the rules instead of recalling them.</h2>
+    <div class="flow">
+      <div class="box"><span class="lbl">Intake</span><h3>The case</h3><p>Profession, where they trained, where they want to practise.</p></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box agent"><span class="lbl">Strands agent · Claude</span><h3>Reasons with three tools</h3>
+        <div class="tools"><code>get_regulator_rules</code><code>today</code><code>months_between</code></div></div>
+      <div class="arrow" aria-hidden="true">→</div>
+      <div class="box"><span class="lbl">Output</span><h3>A grounded pathway</h3><p>Ordered steps, each linked to the regulator's own page. Re-plans on a delay or rejection.</p></div>
+    </div>
+    <div class="notes">
+      <div class="note"><b>Knowledge base</b><p>8 rulesets across 7 jurisdictions — Ontario, BC, New York, California, UK, Australia, Germany — read from regulators' own pages.</p></div>
+      <div class="note"><b>Guardrail</b><p>Regulator names and source links are enforced in code. The model can't invent them.</p></div>
+    </div>
+    <div class="foot"><span>Strands Agents SDK · Claude on Amazon Bedrock · FastAPI · Bedrock AgentCore Runtime</span><span>6</span></div>
+  </section>
+
+  <!-- 7 · Judgment -->
+  <section class="slide" aria-label="Judgment">
+    <div class="eyebrow">What makes it an agent</div>
+    <h2>Judgment, not a checklist.</h2>
+    <div class="judg">
+      <div class="j"><h3>Grounded sequencing</h3><p>Builds the route in the order the regulator requires — assessment before application, application before exams.</p></div>
+      <div class="j mid"><h3>Catches the collision</h3><p>When a step slips, it finds what no longer lines up, with the actual dates — and says what to do.</p>
+        <div class="clock" aria-label="A police check valid for six months expires before the registration decision">
+          <div class="track"></div><div class="valid"></div>
+          <div class="tick" style="left:0"></div><div class="tick" style="left:calc(100% - 2px)"></div>
+          <span class="mk" style="left:0">police check issued</span>
+          <span class="mk end">expires · +6 mo</span>
+          <span class="mk dec">registration decision</span>
+          <span class="cap" style="left:0">example from a live run</span>
+        </div></div>
+      <div class="j"><h3>Knows when not to</h3><p>Software engineering isn't regulated in Ontario — so it says so, and maps work authorization instead of a licence.</p></div>
+    </div>
+    <div class="foot"><span>Date math lives in tools; the decisions are the model's</span><span>7</span></div>
+  </section>
+
+  <!-- 8 · Results -->
+  <section class="slide" aria-label="Results">
+    <div class="eyebrow">Results · live evaluation on Amazon Bedrock</div>
+    <h2>Measured, not claimed.</h2>
+    <div class="stats">
+      <div class="stat"><span class="v">7<small>/7</small></span><p>scenarios passed every check — build, delay, rejection, reset, unregulated, Germany, New York.</p></div>
+      <div class="stat"><span class="v">95<small>%</small></span><p>of steps cite a URL from the target jurisdiction's own curated rules (52 of 55).</p></div>
+      <div class="stat"><span class="v">0</span><p>invented or wrong-jurisdiction sources.</p></div>
+    </div>
+    <div class="deployed"><span class="chip c-complete">deployed</span><span>The same agent runs on Amazon Bedrock AgentCore Runtime.</span></div>
+    <div class="foot"><span>docs/evidence/eval-20260914T012945Z.json · Claude Sonnet 4.6 · 2026-09-13</span><span>8</span></div>
+  </section>
+
+  <!-- 9 · End -->
+  <section class="slide" aria-label="Close">
+    <div class="eyebrow">Credential Bridge</div>
+    <div class="end">
+      <h2>Helping newcomers get back to the work they trained for.</h2>
+      <p class="repo">github.com/youssefnashat/Credential-Bridge</p>
+    </div>
+    <div class="foot"><span>Apache-2.0 · Youssef Nashat · Kanwar Jhattu</span><span>Agents for Humans · Good Neighbor</span></div>
+  </section>
+</div>
+
+<nav class="hud" id="hud" aria-label="Slides"></nav>
+<div class="hint">← → to move · F full screen · H hide controls</div>
+
+<script>
+  const slides = [...document.querySelectorAll('.slide')];
+  const vp = document.getElementById('viewport'), hud = document.getElementById('hud');
+  let i = Math.min(Math.max((parseInt(location.hash.slice(1), 10) || 1) - 1, 0), slides.length - 1);
+
+  slides.forEach((s, n) => {
+    const b = document.createElement('button');
+    b.id = 'go-' + (n + 1); b.setAttribute('aria-label', 'Slide ' + (n + 1) + ': ' + s.getAttribute('aria-label'));
+    b.addEventListener('click', () => show(n)); hud.appendChild(b);
+  });
+  function show(n) {
+    i = Math.min(Math.max(n, 0), slides.length - 1);
+    slides.forEach((s, k) => s.classList.toggle('is-active', k === i));
+    [...hud.children].forEach((b, k) => b.setAttribute('aria-current', k === i));
+    history.replaceState(null, '', '#' + (i + 1));
+  }
+  function fit() {
+    const s = Math.min((innerWidth - 32) / 1600, innerHeight / 900);
+    vp.style.transform = 'scale(' + s + ')';
+    vp.style.margin = ((900 * s - 900) / 2) + 'px ' + ((1600 * s - 1600) / 2) + 'px';
+  }
+  addEventListener('resize', fit);
+  addEventListener('keydown', e => {
+    if (['ArrowRight', 'PageDown', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); show(i + 1); }
+    else if (['ArrowLeft', 'PageUp', 'Backspace'].includes(e.key)) { e.preventDefault(); show(i - 1); }
+    else if (e.key === 'Home') show(0);
+    else if (e.key === 'End') show(slides.length - 1);
+    else if (e.key.toLowerCase() === 'f') { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); }
+    else if (e.key.toLowerCase() === 'h') document.body.classList.toggle('clean');
+  });
+  vp.addEventListener('click', e => show(e.clientX > innerWidth / 2 ? i + 1 : i - 1));
+  fit(); show(i);
+</script>
