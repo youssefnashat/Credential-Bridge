@@ -5,33 +5,28 @@
    frontend and the reasoning agent. Nothing else in this codebase writes
    reasoning text or decides what a step's status should become.
 
-   ── In production ────────────────────────────────────────────────────
-   This function is an async call to the Credential Bridge agent, which is
-   a separate deployment built on the Strands Agents SDK and hosted on AWS
-   (Bedrock AgentCore Runtime). It is not part of this repository. The real
-   implementation is roughly:
+   It always returns a promise. Two modes, chosen by the page URL:
 
-       async function getAgentReasoning(profile, event) {
-         const res = await fetch(`${AGENT_ENDPOINT}/reason`, {
-           method: 'POST',
-           headers: { 'content-type': 'application/json', ...auth },
-           body: JSON.stringify({ profile, event })
-         });
-         return res.json();   // same shape as below
-       }
+   ── Live (default) ───────────────────────────────────────────────────
+   POST {api}/reason on the Credential Bridge backend (FastAPI locally, or
+   AgentCore Runtime), a Strands agent on Amazon Bedrock grounded in the
+   compliance knowledge base. `?api=` sets the base URL; the default is
+   http://localhost:8000. The live adapter at the bottom of this file maps
+   the intake profile and event onto the backend contract and maps the
+   reply back. The reply's steps replace the pathway wholesale:
+   {
+     steps:     [ { id, title, authority, detail, status, sourceUrl } ]
+     entries:   [ { kind, title, body: [paragraph, ...] } ]
+     tie:       { fromId, toId, label } | null   first..last at-risk step
+     flag:      boolean                          the agent's logEntry.flag
+     regulator: { name, url } | null
+   }
 
-   The agent there holds the regulatory knowledge base, reasons over the
-   applicant's live document set and the real regulator calendars, and
-   returns the same response shape this file returns.
-
-   ── In this demo ─────────────────────────────────────────────────────
-   The function is synchronous and deterministic. It composes templated
-   reasoning from the current profile and pathway state. No model is
-   called and no network request is made. Swapping in the real agent means
-   replacing the body of this one function and awaiting it at the two call
-   sites in app.js — nothing else changes.
-
-   ── Response shape ───────────────────────────────────────────────────
+   ── Mock (?mock=1) ───────────────────────────────────────────────────
+   The original offline demo: synchronous, deterministic, templated from
+   the profile and pathway state. No model is called, no request is made,
+   and its dates are illustrative. The page labels itself as a demo in
+   this mode. It patches the locally built pathway instead:
    {
      entries:   [ { kind, title, body: [paragraph, ...] } ]   log entries
      stepUpdates: [ { id, status, flag } ]        status changes to apply
@@ -366,14 +361,14 @@
   }
 
   /* ═══════════════════════════════════════════════════════════════════
-     getAgentReasoning(profile, event)
+     mockReasoning(profile, event) — the offline demo, used only with ?mock=1.
 
      profile  { name, profession, trainedIn, country, region, caseRef }
      event    { type, steps }
        type ∈ 'pathway.build' | 'conflict.simulate'
             | 'rejection.simulate' | 'pathway.reset'
      ═══════════════════════════════════════════════════════════════════ */
-  function getAgentReasoning(profile, event) {
+  function mockReasoning(profile, event) {
     var b = CB.BODIES[profile.region];
     var steps = event.steps || [];
     var key = profile.profession + '|' + profile.country;
@@ -538,5 +533,177 @@
     return empty;
   }
 
-  CB.getAgentReasoning = getAgentReasoning;
+  /* ═══════════════════════════════════════════════════════════════════
+     Live adapter — POST {api}/reason.
+
+     Request and response follow the backend contract in README.md:
+       { profile{name,profession,countryTrained,targetCountry,targetRegion},
+         event, currentSteps[] }
+       -> { steps[]{id,title,status,detail,source,sourceUrl},
+            logEntry{text,flag}, regulator?, regulatorUrl? }
+     The reply is translated into the same shape app.js already applies.
+     Nothing is added to it: every step, status and sentence on screen
+     comes from the agent.
+     ═══════════════════════════════════════════════════════════════════ */
+  var params = new URLSearchParams(window.location.search);
+  CB.MOCK = params.get('mock') === '1';
+  CB.API = (params.get('api') || 'http://localhost:8000').replace(/\/+$/, '');
+
+  var TIMEOUT_MS = 120000;
+
+  var EVENTS = {
+    'pathway.build':      'build_pathway',
+    'conflict.simulate':  'simulate_delay',
+    'rejection.simulate': 'simulate_rejection',
+    'pathway.reset':      'reset'
+  };
+  /* Intake labels that differ from the backend's profession names. */
+  var PROFESSIONS = { 'Doctor / Physician': 'Physician' };
+  var STATUSES = ['complete', 'in-progress', 'upcoming', 'not-started', 'at-risk'];
+
+  function toRequest(profile, event) {
+    return {
+      profile: {
+        name: profile.name,
+        profession: PROFESSIONS[profile.profession] || profile.profession,
+        countryTrained: profile.trainedIn,
+        targetCountry: profile.country,
+        targetRegion: profile.region
+      },
+      event: EVENTS[event.type],
+      currentSteps: (event.steps || []).map(function (s, i) {
+        return {
+          id: i + 1,
+          title: s.title,
+          status: s.status,
+          detail: s.detail,
+          source: s.authority || null,
+          sourceUrl: s.sourceUrl || null
+        };
+      })
+    };
+  }
+
+  function safeUrl(url) {
+    return typeof url === 'string' && /^https?:\/\//i.test(url) ? url : null;
+  }
+
+  /* Plain text in; paragraphs out. Stray backticks are neutralised so they
+     cannot open a mono span, and ISO dates are set in mono like the rest of
+     the record data. */
+  function toParagraphs(text) {
+    return String(text).split(/\n\s*\n/)
+      .map(function (p) { return p.trim(); })
+      .filter(Boolean)
+      .map(function (p) {
+        return p.replace(/`/g, '\'').replace(/\b(\d{4}-\d{2}-\d{2})\b/g, '`$1`');
+      });
+  }
+
+  /* The entry's kind and title restate the event and the agent's flag.
+     They never add a claim of their own. */
+  function entryFor(type, flag) {
+    if (type === 'pathway.reset') return { kind: 'reset', title: 'Case reset' };
+    if (type === 'rejection.simulate') {
+      return flag ? { kind: 'rejection', title: 'Document rejection' }
+                  : { kind: 'plan', title: 'Rejection assessed' };
+    }
+    if (type === 'conflict.simulate') {
+      return flag ? { kind: 'conflict', title: 'Conflict detected' }
+                  : { kind: 'plan', title: 'Delay assessed, no conflict flagged' };
+    }
+    return flag ? { kind: 'conflict', title: 'Pathway mapped, conflict flagged' }
+                : { kind: 'plan', title: 'Pathway mapped' };
+  }
+
+  /* Bracket the first and last at-risk steps when the agent flagged it. */
+  function tieFor(type, steps, flag) {
+    if (!flag) return null;
+    var risky = steps.filter(function (s) { return s.status === 'at-risk'; });
+    if (risky.length < 2) return null;
+    return {
+      fromId: risky[0].id,
+      toId: risky[risky.length - 1].id,
+      label: type === 'conflict.simulate' ? 'conflict' : 'at risk'
+    };
+  }
+
+  function fromResponse(type, data) {
+    if (!data || !Array.isArray(data.steps) || !data.logEntry ||
+        typeof data.logEntry.text !== 'string') {
+      throw new Error('The agent replied, but not in the /reason contract shape.');
+    }
+    var flag = !!data.logEntry.flag;
+    var steps = data.steps.map(function (s, i) {
+      return {
+        id: typeof s.id === 'number' ? s.id : i + 1,
+        title: String(s.title || ''),
+        authority: s.source ? String(s.source) : '',
+        detail: String(s.detail || ''),
+        status: STATUSES.indexOf(s.status) >= 0 ? s.status : 'not-started',
+        sourceUrl: safeUrl(s.sourceUrl),
+        blockedBy: null,
+        flag: null
+      };
+    });
+    var entry = entryFor(type, flag);
+    return {
+      steps: steps,
+      tie: tieFor(type, steps, flag),
+      flag: flag,
+      regulator: data.regulator
+        ? { name: String(data.regulator), url: safeUrl(data.regulatorUrl) }
+        : null,
+      entries: [{ kind: entry.kind, title: entry.title, body: toParagraphs(data.logEntry.text) }]
+    };
+  }
+
+  function describeError(body) {
+    try {
+      var detail = JSON.parse(body).detail;
+      if (!detail) return '.';
+      return ': ' + (typeof detail === 'string' ? detail : JSON.stringify(detail)).slice(0, 240);
+    } catch (e) {
+      return '.';
+    }
+  }
+
+  function liveReasoning(profile, event) {
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = ctrl ? setTimeout(function () { ctrl.abort(); }, TIMEOUT_MS) : null;
+
+    return fetch(CB.API + '/reason', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(toRequest(profile, event)),
+      signal: ctrl ? ctrl.signal : undefined
+    }).then(function (res) {
+      return res.text().then(function (body) {
+        if (!res.ok) throw new Error('The agent returned HTTP ' + res.status + describeError(body));
+        var data;
+        try { data = JSON.parse(body); } catch (e) {
+          throw new Error('The agent replied with something that is not JSON.');
+        }
+        return fromResponse(event.type, data);
+      });
+    }, function (err) {
+      if (err && err.name === 'AbortError') {
+        throw new Error('The agent took longer than ' + (TIMEOUT_MS / 1000) + ' seconds to answer.');
+      }
+      throw new Error('Could not reach the agent at ' + CB.API + '. Is the backend running?');
+    }).finally(function () {
+      if (timer) clearTimeout(timer);
+    });
+  }
+
+  /* The one seam. Always returns a promise, in either mode. */
+  CB.getAgentReasoning = function (profile, event) {
+    if (CB.MOCK) {
+      try { return Promise.resolve(mockReasoning(profile, event)); } catch (e) { return Promise.reject(e); }
+    }
+    return liveReasoning(profile, event);
+  };
+
+  /* Exposed for the offline adapter test. */
+  CB.adapter = { toRequest: toRequest, fromResponse: fromResponse };
 })();

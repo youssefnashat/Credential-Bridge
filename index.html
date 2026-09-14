@@ -84,6 +84,18 @@
             <input type="radio" name="country" value="United States">
             <span>United States</span>
           </label>
+          <label class="segmented__opt" data-live-only>
+            <input type="radio" name="country" value="United Kingdom">
+            <span>United Kingdom</span>
+          </label>
+          <label class="segmented__opt" data-live-only>
+            <input type="radio" name="country" value="Australia">
+            <span>Australia</span>
+          </label>
+          <label class="segmented__opt" data-live-only>
+            <input type="radio" name="country" value="Germany">
+            <span>Germany</span>
+          </label>
         </div>
         <p class="field__error" id="err-country" hidden></p>
       </fieldset>
@@ -98,7 +110,7 @@
 
       <button class="btn btn--primary btn--block" type="submit">Build my pathway</button>
 
-      <p class="form__foot">
+      <p class="form__foot" id="form-foot">
         Demo environment. Nothing is submitted to a regulator, and nothing is kept
         after you close this tab.
       </p>
@@ -118,7 +130,10 @@
       </svg>
       <span class="mark__name">Credential&nbsp;Bridge</span>
     </div>
-    <p class="topbar__ref" id="case-ref"></p>
+    <div class="topbar__meta">
+      <span class="chip chip--amber" id="mode-chip" hidden>Demo mode · simulated agent, illustrative dates</span>
+      <p class="topbar__ref" id="case-ref"></p>
+    </div>
   </header>
 
   <div class="app__body">
@@ -135,7 +150,7 @@
         </dl>
       </section>
 
-      <section class="panel">
+      <section class="panel" id="docs-panel">
         <h2 class="panel__title">Documents on file</h2>
         <ul class="docs" id="docs"></ul>
       </section>
@@ -146,11 +161,11 @@
         <div class="sim">
           <button class="btn btn--quiet" type="button" id="sim-conflict">
             <span class="sim__dot sim__dot--amber" aria-hidden="true"></span>
-            Trigger a schedule conflict
+            Simulate a schedule delay
           </button>
           <button class="btn btn--quiet" type="button" id="sim-rejection">
             <span class="sim__dot sim__dot--rust" aria-hidden="true"></span>
-            Trigger a document rejection
+            Simulate a document rejection
           </button>
           <button class="btn btn--ghost" type="button" id="sim-reset">Reset the case</button>
         </div>
@@ -171,6 +186,7 @@
             <header class="secthead">
               <h2 class="secthead__title" id="pathway-title"></h2>
               <p class="secthead__sub" id="pathway-sub"></p>
+              <p class="secthead__reg" id="pathway-reg" hidden></p>
             </header>
             <ol class="timeline" id="timeline"></ol>
           </div>
@@ -179,7 +195,7 @@
             <div class="reasoning__inner">
               <header class="reasoning__head">
                 <h2 class="reasoning__title">Agent reasoning</h2>
-                <p class="reasoning__sub">Simulated Strands agent · demo mode</p>
+                <p class="reasoning__sub" id="reasoning-sub"></p>
               </header>
               <ol class="log" id="log"></ol>
             </div>

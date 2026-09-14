@@ -4,7 +4,11 @@
    This file never writes reasoning text and never decides on its own what
    a step's status should be. It collects the profile, asks the agent
    (CB.getAgentReasoning, see agent.js), applies what comes back, and draws
-   the result. All state is in memory; nothing is persisted anywhere.
+   the result. All state is in memory; nothing is persisted in the browser.
+
+   Live mode (default): the agent owns the pathway. Every response replaces
+   the steps wholesale, and only what the agent returned is drawn.
+   Mock mode (?mock=1): the original offline demo, clearly labelled.
    ═══════════════════════════════════════════════════════════════════════ */
 
 (function () {
@@ -12,16 +16,27 @@
 
   var CB = window.CB;
   var $ = function (id) { return document.getElementById(id); };
+  var LIVE = !CB.MOCK;
 
   /* ── In-memory state. Cleared on reload, by design. ─────────────────── */
-  var state = {
-    profile: null,
-    steps: [],
-    docs: [],
-    log: [],
-    tie: null,
-    drafts: []
-  };
+  function freshState() {
+    return {
+      profile: null,
+      steps: [],
+      docs: [],
+      log: [],
+      tie: null,
+      drafts: [],
+      regulator: null,
+      pending: null,   /* event type in flight, or null */
+      error: null      /* { type, message } from the last failed call */
+    };
+  }
+  var state = freshState();
+
+  /* Bumped whenever a case opens or closes, so a reply that arrives for a
+     case the user has already left is dropped instead of drawn. */
+  var ticket = 0;
 
   var MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
                 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -40,6 +55,13 @@
     conflict:  { label: 'Conflict',   tone: 'amber' },
     rejection: { label: 'Rejection',  tone: 'rust'  },
     reset:     { label: 'Reset',      tone: 'mute'  }
+  };
+
+  var PENDING = {
+    'pathway.build':      'Building the pathway',
+    'conflict.simulate':  'Checking the pathway against a delay',
+    'rejection.simulate': 'Re-planning around a rejection',
+    'pathway.reset':      'Regenerating the pathway'
   };
 
   /* ── Helpers ────────────────────────────────────────────────────────── */
@@ -65,6 +87,35 @@
   function chip(label, tone) {
     return '<span class="chip chip--' + tone + '">' + escapeHtml(label) + '</span>';
   }
+  function link(url, text) {
+    return '<a href="' + escapeHtml(url) + '" target="_blank" rel="noopener noreferrer">' +
+      escapeHtml(text) + '</a>';
+  }
+  function hostOf(url) {
+    try { return new URL(url).host; } catch (e) { return url; }
+  }
+  function isNational(country) { return CB.NATIONAL.indexOf(country) >= 0; }
+
+  /* ═══ Mode ═══════════════════════════════════════════════════════════ */
+  function applyMode() {
+    Array.prototype.forEach.call(document.querySelectorAll('[data-live-only]'), function (el) {
+      el.hidden = !LIVE;
+    });
+    /* The documents panel and the drafts tab are templated in the mock, with
+       invented dates and hardcoded regulators. The agent returns neither, so
+       in live mode they are not shown at all. */
+    $('docs-panel').hidden = LIVE;
+    $('tab-drafts').hidden = LIVE;
+    $('mode-chip').hidden = LIVE;
+    $('reasoning-sub').textContent = LIVE
+      ? 'Strands agent on Amazon Bedrock · ' + hostOf(CB.API)
+      : 'Simulated agent · demo mode · no model is called';
+    $('form-foot').textContent = LIVE
+      ? 'Your profile is sent to the Credential Bridge agent to generate the pathway. ' +
+        'Nothing is submitted to a regulator.'
+      : 'Demo environment. Nothing is submitted to a regulator, and nothing is kept ' +
+        'after you close this tab.';
+  }
 
   /* ═══ Intake ═════════════════════════════════════════════════════════ */
   var form = $('intake-form');
@@ -83,13 +134,15 @@
 
   function readForm() {
     var checked = form.querySelector('input[name="country"]:checked');
+    var country = checked ? checked.value : '';
     return {
       name: $('in-name').value.trim(),
       profession: $('in-profession').value,
       trainedIn: elTrained.value,
       trainedInRegion: trainedRegionShown() ? elTrainedRegion.value : '',
-      country: checked ? checked.value : '',
-      region: elRegion.value
+      country: country,
+      /* National rulesets have no region: the country stands in for it. */
+      region: isNational(country) ? country : elRegion.value
     };
   }
 
@@ -113,6 +166,9 @@
 
   function trainedRegionShown() {
     return !form.querySelector('[data-field="trainedInRegion"]').hidden;
+  }
+  function regionShown() {
+    return !form.querySelector('[data-field="region"]').hidden;
   }
 
   /* Someone who trained in Canada or the US may well be moving between
@@ -144,8 +200,16 @@
 
   function populateRegions() {
     var checked = form.querySelector('input[name="country"]:checked');
+    var wrap = form.querySelector('[data-field="region"]');
     var previous = elRegion.value;
     elRegion.innerHTML = '';
+
+    if (checked && isNational(checked.value)) {
+      wrap.hidden = true;
+      setFieldError('region', null);
+      return;
+    }
+    wrap.hidden = false;
 
     if (!checked) {
       elRegion.disabled = true;
@@ -173,14 +237,11 @@
     var slot = function (value) {
       return value ? '<b>' + escapeHtml(value) + '</b>' : '—';
     };
-    var target = (v.region || v.country)
-      ? slot([v.region, v.country].filter(Boolean).join(', '))
-      : '—';
-    var trained = v.trainedInRegion ? v.trainedInRegion + ', ' + v.trainedIn : v.trainedIn;
+    var target = (v.region || v.country) ? slot(CB.targetLabel(v)) : '—';
     $('caseslip').innerHTML =
       'Case file &nbsp;·&nbsp; ' + slot(v.name) +
       ' &nbsp;·&nbsp; ' + slot(v.profession) +
-      ' &nbsp;·&nbsp; trained in ' + slot(trained) +
+      ' &nbsp;·&nbsp; trained in ' + slot(CB.trainedInLabel(v)) +
       ' &nbsp;·&nbsp; seeking ' + target;
   }
 
@@ -206,8 +267,9 @@
     e.preventDefault();
     var v = readForm();
     var firstBad = null;
-    var required = ['name', 'profession', 'trainedIn', 'country', 'region'];
+    var required = ['name', 'profession', 'trainedIn', 'country'];
     if (trainedRegionShown()) required.splice(3, 0, 'trainedInRegion');
+    if (regionShown()) required.push('region');
 
     required.forEach(function (field) {
       if (!v[field]) {
@@ -248,27 +310,30 @@
   }
 
   function openCase(values) {
+    ticket++;
+    state = freshState();
     state.profile = Object.assign({}, values, { caseRef: makeCaseRef() });
-    state.steps = CB.buildPathway(state.profile);
-    state.docs = freshDocs();
-    state.log = [];
-    state.tie = null;
-    state.drafts = CB.getDrafts(state.profile, fmtDate(new Date()));
 
-    /* Ask the agent for its opening read on the case. */
-    applyReasoning(CB.getAgentReasoning(state.profile, {
-      type: 'pathway.build',
-      steps: state.steps
-    }));
+    /* The mock builds its pathway from local templates. Live, the agent
+       builds it, so the timeline starts empty and fills on the first reply. */
+    if (!LIVE) {
+      state.steps = CB.buildPathway(state.profile);
+      state.docs = freshDocs();
+      state.drafts = CB.getDrafts(state.profile, fmtDate(new Date()));
+    }
 
     $('intake').hidden = true;
     $('dashboard').hidden = false;
     renderAll();
     window.scrollTo(0, 0);
+
+    /* Ask the agent for its opening read on the case. */
+    send('pathway.build');
   }
 
   function startOver() {
-    state = { profile: null, steps: [], docs: [], log: [], tie: null, drafts: [] };
+    ticket++;
+    state = freshState();
     form.reset();
     populateTrainedRegion();
     populateRegions();
@@ -280,10 +345,63 @@
     $('in-name').focus();
   }
 
+  /* ── Send one event to the agent ────────────────────────────────────── */
+  var MOCK_NOTES = {
+    'conflict.simulate':  'Conflict detected. The agent has flagged two steps.',
+    'rejection.simulate': 'Document rejected. A remediation step has been added.',
+    'pathway.reset':      'Case reset to the original pathway.'
+  };
+
+  /* Toasts only repeat what the agent actually concluded. */
+  function noteFor(type, result) {
+    if (type === 'pathway.build') return null;
+    if (!LIVE) return MOCK_NOTES[type];
+    if (type === 'pathway.reset') return 'Case reset. The agent regenerated the pathway.';
+    if (type === 'conflict.simulate') {
+      return result.flag ? 'Conflict flagged. See the agent log.' : 'No conflict flagged. See the agent log.';
+    }
+    return result.flag ? 'Rejection processed. See the agent log.' : 'The agent did not flag a problem. See the agent log.';
+  }
+
+  function send(type) {
+    if (state.pending || !state.profile) return;
+    var mine = ticket;
+    state.pending = type;
+    state.error = null;
+    setControls();
+    renderLog();
+    if (!state.steps.length) renderPathway();
+
+    CB.getAgentReasoning(state.profile, { type: type, steps: state.steps }).then(
+      function (result) {
+        if (mine !== ticket) return;
+        state.pending = null;
+        applyReasoning(result);
+        renderCase();
+        var note = noteFor(type, result);
+        if (note) toast(note);
+      },
+      function (err) {
+        if (mine !== ticket) return;
+        state.pending = null;
+        state.error = { type: type, message: (err && err.message) || String(err) };
+        renderCase();
+      }
+    );
+  }
+
   /* ── Apply an agent response to state ───────────────────────────────── */
   function applyReasoning(result) {
     if (!result) return;
 
+    /* Live: the agent owns the pathway, so replace it wholesale. */
+    if (result.steps) {
+      state.steps = result.steps;
+      state.tie = result.tie || null;
+      if (result.regulator) state.regulator = result.regulator;
+    }
+
+    /* Mock: the templated demo patches a locally built pathway. */
     if (result.rebuild) {
       state.steps = CB.buildPathway(state.profile);
       state.docs = freshDocs();
@@ -326,7 +444,7 @@
       doc.tone = u.tone;
     });
 
-    if (result.tie) state.tie = result.tie;
+    if (!result.steps && result.tie) state.tie = result.tie;
 
     (result.entries || []).forEach(function (entry) {
       state.log.unshift(Object.assign({ time: clockTime(), isNew: true }, entry));
@@ -336,10 +454,26 @@
   /* ═══ Rendering ══════════════════════════════════════════════════════ */
   function renderAll() {
     renderHeader();
+    renderCase();
+    renderDrafts();
+  }
+
+  function renderCase() {
+    setControls();
     renderSidebar();
     renderPathway();
     renderLog();
-    renderDrafts();
+  }
+
+  /* Scenario buttons only make sense once there is a pathway to act on,
+     and only one event can be in flight at a time. */
+  function setControls() {
+    var busy = !!state.pending;
+    var none = !state.steps.length;
+    $('sim-conflict').disabled = busy || none;
+    $('sim-rejection').disabled = busy || none;
+    $('sim-reset').disabled = busy || none;
+    $('dashboard').setAttribute('aria-busy', busy ? 'true' : 'false');
   }
 
   function renderHeader() {
@@ -351,7 +485,7 @@
     $('side-name').textContent = p.name;
     $('side-profession').textContent = p.profession;
     $('side-trained').textContent = CB.trainedInLabel(p);
-    $('side-target').textContent = p.region + ', ' + p.country;
+    $('side-target').textContent = CB.targetLabel(p);
 
     $('docs').innerHTML = state.docs.map(function (d) {
       return '<li class="doc">' +
@@ -365,6 +499,28 @@
   var MARKER_CHECK = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 5.2l2.4 2.4L8.6 2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
   var MARKER_BANG  = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M5 2.2v3.4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><circle cx="5" cy="7.8" r="1" fill="currentColor"/></svg>';
 
+  function renderRegulator() {
+    var el = $('pathway-reg');
+    var r = state.regulator;
+    if (!r || !r.name) { el.hidden = true; el.innerHTML = ''; return; }
+    el.hidden = false;
+    el.innerHTML = 'Regulator &nbsp;·&nbsp; ' + (r.url ? link(r.url, r.name) : escapeHtml(r.name));
+  }
+
+  /* Where a step came from. Live, a step with no citation says so rather
+     than leaving the gap silent. */
+  function sourceLine(step) {
+    var parts = [];
+    if (step.authority) parts.push(escapeHtml(step.authority));
+    if (step.sourceUrl) {
+      parts.push('<a class="card__source" href="' + escapeHtml(step.sourceUrl) +
+        '" target="_blank" rel="noopener noreferrer">source ↗</a>');
+    } else if (LIVE) {
+      parts.push('<span class="card__nosource">no source cited</span>');
+    }
+    return parts.length ? '<p class="card__authority">' + parts.join(' &nbsp;·&nbsp; ') + '</p>' : '';
+  }
+
   function renderPathway() {
     var p = state.profile;
     var regulated = CB.isRegulated(p);
@@ -374,12 +530,26 @@
       : 'Work authorisation pathway — ' + p.region;
 
     $('pathway-sub').textContent = regulated
-      ? 'Generated for a ' + p.profession + ' trained outside ' + p.country +
+      ? 'Generated for a ' + p.profession + ' trained in ' + CB.trainedInLabel(p) +
         '. Statuses update as the agent reasons over the case.'
       : p.profession + ' is not a regulated profession in ' + p.region +
         '. This pathway covers work authorisation only.';
 
+    renderRegulator();
+
     var tl = $('timeline');
+
+    if (!state.steps.length) {
+      var msg = state.pending
+        ? '<span class="pulse" aria-hidden="true"></span>The agent is building the pathway from the regulator rules…'
+        : state.error
+          ? 'No pathway yet. The agent could not complete the request. Retry from the agent log.'
+          : '';
+      tl.innerHTML = msg ? '<li class="timeline__empty">' + msg + '</li>' : '';
+      drawTie();
+      return;
+    }
+
     tl.innerHTML = state.steps.map(function (step, i) {
       var meta = STATUS[step.status] || STATUS['not-started'];
       var blocked = !!step.blockedBy;
@@ -399,7 +569,7 @@
           '<div class="card__head">' +
             '<div>' +
               '<h3 class="card__title">' + escapeHtml(step.title) + '</h3>' +
-              '<p class="card__authority">' + escapeHtml(step.authority) + '</p>' +
+              sourceLine(step) +
             '</div>' +
             (blocked && step.status !== 'at-risk'
               ? chip('Blocked', 'mute') : chip(meta.label, meta.tone)) +
@@ -447,8 +617,28 @@
     tl.appendChild(el);
   }
 
+  function renderStatusEntry() {
+    if (state.pending) {
+      return '<li class="entry entry--pending">' +
+        '<div class="entry__head">' + chip('Reasoning', 'teal') + '</div>' +
+        '<h3 class="entry__title">' + escapeHtml(PENDING[state.pending] || 'Working') +
+          '<span class="dots" aria-hidden="true"><i></i><i></i><i></i></span></h3>' +
+        (LIVE ? '<p class="entry__hint">Waiting for the agent. A live call can take up to a minute.</p>' : '') +
+      '</li>';
+    }
+    if (state.error) {
+      return '<li class="entry entry--error" role="alert">' +
+        '<div class="entry__head">' + chip('Error', 'rust') + '</div>' +
+        '<h3 class="entry__title">The agent did not answer</h3>' +
+        '<div class="entry__body"><p>' + escapeHtml(state.error.message) + '</p></div>' +
+        '<button class="btn btn--quiet btn--retry" type="button" data-retry>Retry</button>' +
+      '</li>';
+    }
+    return '';
+  }
+
   function renderLog() {
-    $('log').innerHTML = state.log.map(function (entry) {
+    $('log').innerHTML = renderStatusEntry() + state.log.map(function (entry) {
       var kind = ENTRY_KINDS[entry.kind] || ENTRY_KINDS.plan;
       var html = '<li class="entry' + (entry.isNew ? ' entry--enter' : '') + '">' +
         '<div class="entry__head">' +
@@ -503,24 +693,17 @@
   }
 
   /* ═══ Wiring ═════════════════════════════════════════════════════════ */
-  function simulate(type, note) {
-    applyReasoning(CB.getAgentReasoning(state.profile, { type: type, steps: state.steps }));
-    renderSidebar();
-    renderPathway();
-    renderLog();
-    toast(note);
-  }
-
-  $('sim-conflict').addEventListener('click', function () {
-    simulate('conflict.simulate', 'Conflict detected. The agent has flagged two steps.');
-  });
-  $('sim-rejection').addEventListener('click', function () {
-    simulate('rejection.simulate', 'Document rejected. A remediation step has been added.');
-  });
-  $('sim-reset').addEventListener('click', function () {
-    simulate('pathway.reset', 'Case reset to the original pathway.');
-  });
+  $('sim-conflict').addEventListener('click', function () { send('conflict.simulate'); });
+  $('sim-rejection').addEventListener('click', function () { send('rejection.simulate'); });
+  $('sim-reset').addEventListener('click', function () { send('pathway.reset'); });
   $('start-over').addEventListener('click', startOver);
+
+  $('log').addEventListener('click', function (e) {
+    if (!e.target.closest('[data-retry]') || !state.error) return;
+    var type = state.error.type;
+    state.error = null;
+    send(type);
+  });
 
   $('drafts').addEventListener('click', function (e) {
     var btn = e.target.closest('[data-submit-draft]');
@@ -542,12 +725,14 @@
     if (tab.id === 'tab-pathway') requestAnimationFrame(drawTie);
   }
 
-  tabs.forEach(function (tab, i) {
+  tabs.forEach(function (tab) {
     tab.addEventListener('click', function () { selectTab(tab); });
     tab.addEventListener('keydown', function (e) {
       if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
       e.preventDefault();
-      var next = tabs[(i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length];
+      var shown = tabs.filter(function (t) { return !t.hidden; });
+      var i = shown.indexOf(tab);
+      var next = shown[(i + (e.key === 'ArrowRight' ? 1 : shown.length - 1)) % shown.length];
       selectTab(next);
       next.focus();
     });
@@ -564,6 +749,7 @@
   }
 
   /* ── First paint ────────────────────────────────────────────────────── */
+  applyMode();
   populateTrainedIn();
   populateTrainedRegion();
   populateRegions();

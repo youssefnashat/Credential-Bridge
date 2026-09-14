@@ -61,6 +61,18 @@ CB.REGIONS = {
   'United States': ['New York', 'California', 'Texas']
 };
 
+/* Target countries the knowledge base holds as one national ruleset. There
+   is no region to choose; the country name is sent as the region. Live mode
+   only: the offline mock has no templates for them. */
+CB.NATIONAL = ['United Kingdom', 'Australia', 'Germany'];
+
+/* Where the applicant is headed, as one display string. */
+CB.targetLabel = function (profile) {
+  return profile.region && profile.region !== profile.country
+    ? profile.region + ', ' + profile.country
+    : profile.country;
+};
+
 /* Regional regulators and assessment services. */
 CB.BODIES = {
   'Ontario': {
