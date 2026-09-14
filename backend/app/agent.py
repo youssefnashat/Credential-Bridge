@@ -208,8 +208,12 @@ def _ground(r: ReasonResponse, req: ReasonRequest) -> ReasonResponse:
     jurisdiction's URL set (its ruleset + regulators.json entry). Titles/statuses/wording stay the model's."""
     from .reference import _compact
     p = req.profile
-    g = lookup(p.profession, p.targetCountry, p.targetRegion)
-    allowed = _urls_in(g) | _urls_in(_compact().get(p.profession, {}).get(g.get("region_key") or "", {}))
+    try:
+        g = lookup(p.profession, p.targetCountry, p.targetRegion)
+        allowed = _urls_in(g) | _urls_in(_compact().get(p.profession, {}).get(g.get("region_key") or "", {}))
+    except Exception:  # noqa: BLE001 — fail closed: no grounding data means no citations, not a 500
+        log.exception("grounding lookup failed; nulling regulator and all sourceUrls")
+        g, allowed = {"unknown_region": True}, set()
     grounded = not (g.get("unregulated") or g.get("unknown_region"))
     r.regulator = g.get("regulator") if grounded else None
     r.regulatorUrl = g.get("url") if grounded else None
