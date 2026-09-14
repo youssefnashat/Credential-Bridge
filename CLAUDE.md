@@ -47,7 +47,7 @@ regions in KB (nurse): CA-ON, CA-BC, US-NY, US-CA, GB, AU, DE (+ CA-ON civil eng
 ## Commands
 ```
 # backend (needs AWS + model enabled)
-cd backend && cp .env.example .env       # AWS_REGION=us-west-2; enable claude-3-7-sonnet in Bedrock
+cd backend && cp .env.example .env       # AWS_REGION=us-west-2; Anthropic use-case form already submitted; `aws login` if calls fail
 ./run_local.sh                            # uvicorn :8000
 python tests_smoke.py                     # NO AWS — contract + grounding
 # KB pipeline (validation is no-AWS; harvest needs AWS)
@@ -64,7 +64,7 @@ cd backend && agentcore configure --entrypoint agentcore_entrypoint.py --name cr
 ```
 
 ## Model / region (verified)
-us.anthropic.claude-3-7-sonnet-20250219-v1:0 on us-west-2. Pin CREDBRIDGE_TODAY=2026-09-14 for a
+us.anthropic.claude-sonnet-4-6 on us-west-2 — verified live 2026-09-13 (7/7 eval). 3.7 Sonnet is EOL; Sonnet 5 isn't offered to this account. Pin CREDBRIDGE_TODAY=2026-09-14 for a
 deterministic demo so expiry dates don't drift while filming.
 
 ## Build order for the sprint (do these, in order)
