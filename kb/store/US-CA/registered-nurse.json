@@ -1,14 +1,14 @@
 {
   "profession": "Registered Nurse", "jurisdiction": "US-CA", "region_name": "California", "country": "United States",
   "regulator": "California Board of Registered Nursing (BRN)", "gateway": "direct", "regulated": true,
-  "source": "https://www.rn.ca.gov/applicants/lic-intl.shtml",
+  "source": "https://www.rn.ca.gov/applicants/lic-exam.shtml",
   "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.78, "needs_review": true,
   "requirements": [
-    {"order":1,"kind":"evaluation","name":"Breakdown of educational program / transcript evaluation","body":"California BRN","detail":"BRN reviews foreign nursing education directly (California does not require CGFNS CES for licensure by exam, unlike some states).","valid_at":"application","source":"https://www.rn.ca.gov/applicants/lic-intl.shtml"},
-    {"order":2,"kind":"language","name":"English proficiency (TOEFL iBT) — if applicable","body":"ETS","detail":"Where education was not in English.","validity_months":24,"valid_at":"registration_decision","source":"https://www.rn.ca.gov/applicants/lic-intl.shtml"},
+    {"order":1,"kind":"evaluation","name":"Breakdown of educational program / transcript evaluation","body":"California BRN","detail":"BRN reviews foreign nursing education directly (California does not require CGFNS CES for licensure by exam, unlike some states).","valid_at":"application","source":"https://www.rn.ca.gov/applicants/lic-exam.shtml"},
+    {"order":2,"kind":"language","name":"English proficiency (TOEFL iBT) — if applicable","body":"ETS","detail":"Where education was not in English.","validity_months":24,"valid_at":"registration_decision","source":"https://www.rn.ca.gov/pdfs/education/edp-i-35.pdf"},
     {"order":3,"kind":"background_check","name":"Livescan fingerprints / criminal background","body":"California BRN / DOJ","detail":"Fingerprint-based background check.","valid_at":"registration_decision","source":"https://www.rn.ca.gov/"},
-    {"order":4,"kind":"exam","name":"NCLEX-RN","body":"NCSBN","detail":"National licensure exam; apply to BRN for eligibility.","depends_on":["Breakdown of educational program / transcript evaluation"],"valid_at":"exam","source":"https://www.ncsbn.org/exams.htm"}
+    {"order":4,"kind":"exam","name":"NCLEX-RN","body":"NCSBN","detail":"National licensure exam; apply to BRN for eligibility.","depends_on":["Breakdown of educational program / transcript evaluation"],"valid_at":"exam","source":"https://www.ncsbn.org/exams.page"}
   ],
-  "notes": "California reviews transcripts itself and is stricter on concurrent theory+clinical hours; CGFNS CES is not the licensure gateway here.",
+  "notes": "California reviews transcripts itself and is stricter on concurrent theory+clinical hours; CGFNS CES is not the licensure gateway here. URL check 2026-09-13: https://www.rn.ca.gov/applicants/lic-intl.shtml and https://www.ncsbn.org/exams.htm returned 404 and were replaced with verified BRN/NCSBN pages; the BRN guideline (EDP-I-35, CCR 1413) requires an English exam only when the Board has reasonable doubt and does not name TOEFL.",
   "last_verified": "2026-09-13"
 }

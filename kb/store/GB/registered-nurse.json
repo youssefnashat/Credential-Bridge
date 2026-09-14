@@ -1,15 +1,15 @@
 {
   "profession": "Registered Nurse", "jurisdiction": "GB", "region_name": "United Kingdom", "country": "United Kingdom",
   "regulator": "Nursing and Midwifery Council (NMC)", "gateway": null, "regulated": true,
-  "source": "https://www.nmc.org.uk/registration/joining-the-register/trained-outside-the-uk/",
+  "source": "https://www.nmc.org.uk/registration/joining-the-register/register-nurse-midwife/trained-outside-uk/",
   "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.8, "needs_review": true,
   "requirements": [
-    {"order":1,"kind":"evaluation","name":"NMC eligibility / qualification check","body":"NMC","detail":"Create an NMC account and submit qualification evidence.","valid_at":"application","source":"https://www.nmc.org.uk/registration/joining-the-register/trained-outside-the-uk/"},
+    {"order":1,"kind":"evaluation","name":"NMC eligibility / qualification check","body":"NMC","detail":"Create an NMC account and submit qualification evidence.","valid_at":"application","source":"https://www.nmc.org.uk/registration/joining-the-register/register-nurse-midwife/trained-outside-uk/"},
     {"order":2,"kind":"language","name":"English language evidence (IELTS/OET)","body":"IELTS/OET","detail":"IELTS Academic 7.0 or OET grade B, or an approved alternative.","validity_months":24,"valid_at":"application","source":"https://www.nmc.org.uk/"},
     {"order":3,"kind":"exam","name":"CBT (Computer Based Test) — Test of Competence","body":"NMC","detail":"Part 1 theory exam, sat online.","depends_on":["NMC eligibility / qualification check"],"valid_at":"exam","source":"https://www.nmc.org.uk/"},
     {"order":4,"kind":"exam","name":"OSCE — Objective Structured Clinical Examination","body":"NMC test centres","detail":"Part 2 practical exam, sat in the UK.","depends_on":["CBT (Computer Based Test) — Test of Competence"],"valid_at":"exam","source":"https://www.nmc.org.uk/"},
     {"order":5,"kind":"registration","name":"NMC registration decision","body":"NMC","detail":"Final registration once CBT, OSCE and language are met.","depends_on":["OSCE — Objective Structured Clinical Examination"],"valid_at":null,"source":"https://www.nmc.org.uk/"}
   ],
-  "notes": "Two-part Test of Competence (CBT then OSCE) is distinct from the North American NCLEX model.",
+  "notes": "Two-part Test of Competence (CBT then OSCE) is distinct from the North American NCLEX model. URL check 2026-09-13: https://www.nmc.org.uk/registration/joining-the-register/trained-outside-the-uk/ returned 404 and was replaced with the NMC's current trained-outside-UK page.",
   "last_verified": "2026-09-13"
 }

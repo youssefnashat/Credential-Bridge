@@ -42,7 +42,7 @@
       "regulated": true,
       "requirements": 5,
       "confidence": 0.9,
-      "source": "https://www.cno.org/en/become-a-nurse/registration-requirements/internationally-educated-nurses/",
+      "source": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada",
       "method": "curated"
     },
     {
@@ -62,7 +62,7 @@
       "regulated": true,
       "requirements": 5,
       "confidence": 0.8,
-      "source": "https://www.nmc.org.uk/registration/joining-the-register/trained-outside-the-uk/",
+      "source": "https://www.nmc.org.uk/registration/joining-the-register/register-nurse-midwife/trained-outside-uk/",
       "method": "curated"
     },
     {
@@ -72,7 +72,7 @@
       "regulated": true,
       "requirements": 4,
       "confidence": 0.78,
-      "source": "https://www.rn.ca.gov/applicants/lic-intl.shtml",
+      "source": "https://www.rn.ca.gov/applicants/lic-exam.shtml",
       "method": "curated"
     },
     {
