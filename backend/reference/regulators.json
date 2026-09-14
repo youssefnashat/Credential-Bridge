@@ -2,9 +2,9 @@
   "Registered Nurse": {
     "CA-ON": {
       "regulator": "College of Nurses of Ontario (CNO)",
-      "gateway": "NNAS",
-      "url": "https://www.cno.org/en/become-a-nurse/registration-requirements/internationally-educated-nurses/",
-      "eval": "NNAS Advisory Report",
+      "gateway": "Approved ECA provider (WES / ICAS / ICES-BCIT)",
+      "url": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada",
+      "eval": "Educational credential assessment (ECA)",
       "language": [
         "IELTS Academic",
         "CELBAN",
@@ -12,8 +12,8 @@
       ],
       "exam": "NCLEX-RN",
       "language_validity_months": 24,
-      "eval_validity_months": 60,
-      "notes": "NNAS report feeds CNO; language test must be valid at time of registration decision, not just application."
+      "eval_validity_months": null,
+      "notes": "A CNO-approved ECA report (WES, ICAS or ICES/BCIT) must reach CNO before you apply; CNO still accepts NNAS expedited reports prepared by CGFNS/TruMerit. Language test must be valid at time of registration decision, not just application."
     },
     "CA-BC": {
       "regulator": "BC College of Nurses and Midwives (BCCNM)",
@@ -31,7 +31,7 @@
     "CA-AB": {
       "regulator": "College of Registered Nurses of Alberta (CRNA)",
       "gateway": "NNAS",
-      "url": "https://nurses.ab.ca/apply-here/internationally-educated-nurses/",
+      "url": "https://www.nurses.ab.ca/nursing-in-alberta/international-applicants/",
       "eval": "NNAS Advisory Report",
       "language": [
         "IELTS Academic",
@@ -56,19 +56,18 @@
     "US-CA": {
       "regulator": "California Board of Registered Nursing",
       "gateway": "direct",
-      "url": "https://www.rn.ca.gov/applicants/lic-intl.shtml",
+      "url": "https://www.rn.ca.gov/applicants/lic-exam.shtml",
       "eval": "Board-approved transcript evaluation",
-      "language": [
-        "TOEFL iBT"
-      ],
+      "language": [],
       "exam": "NCLEX-RN",
-      "language_validity_months": 24,
-      "eval_validity_months": null
+      "language_validity_months": null,
+      "eval_validity_months": null,
+      "notes": "English exam required only when the BRN has reasonable doubt of the applicant's English comprehension (CCR 1413, guideline EDP-I-35); no specific test or validity period is named."
     },
     "US-TX": {
       "regulator": "Texas Board of Nursing",
       "gateway": "CGFNS",
-      "url": "https://www.bon.texas.gov/licensure_endorsement.asp",
+      "url": "https://www.bon.texas.gov/licensure_examination.asp.html",
       "eval": "CGFNS Credentials Evaluation",
       "language": [
         "TOEFL iBT"
@@ -80,7 +79,7 @@
     "GB": {
       "regulator": "Nursing and Midwifery Council (NMC)",
       "gateway": null,
-      "url": "https://www.nmc.org.uk/registration/joining-the-register/trained-outside-the-uk/",
+      "url": "https://www.nmc.org.uk/registration/joining-the-register/register-nurse-midwife/trained-outside-uk/",
       "eval": "NMC qualification check",
       "language": [
         "IELTS Academic",
@@ -201,7 +200,7 @@
     "US-NY": {
       "regulator": "NYSED Office of the Professions",
       "gateway": "direct",
-      "url": "https://www.op.nysed.gov/professions/professional-engineering",
+      "url": "https://www.op.nysed.gov/professions/engineering/license-requirements",
       "eval": "Transcript + experience review",
       "language": [],
       "exam": "FE then PE",
@@ -235,7 +234,7 @@
     "US-NY": {
       "regulator": "NYSED Office of Teaching Initiatives",
       "gateway": "direct",
-      "url": "https://www.nysed.gov/educator-integrity/teacher-certification",
+      "url": "https://www.nysed.gov/teaching-initiatives/submitting-foreign-credentials",
       "eval": "Course-by-course evaluation",
       "language": [
         "TOEFL"
