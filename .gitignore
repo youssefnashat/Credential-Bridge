@@ -5,3 +5,6 @@ __pycache__/
 data/audit.jsonl
 .bedrock_agentcore*
 Dockerfile.agentcore
+data/sessions/
+backend/data/
+.git/index.baseline
