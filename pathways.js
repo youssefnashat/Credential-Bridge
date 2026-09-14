@@ -134,13 +134,75 @@ CB.BODIES = {
   }
 };
 
-/* Documents that arrive with every case file in this demo. */
+/* The document types a case can hold. Which of these a given applicant
+   actually needs is derived from their pathway, not from this list. */
 CB.DOCUMENTS = [
-  { id: 'eval',        name: 'Credential evaluation report' },
-  { id: 'language',    name: 'Language proficiency test' },
-  { id: 'transcripts', name: 'Academic transcripts, sealed' },
-  { id: 'practice',    name: 'Proof of practice hours' }
+  { id: 'transcripts', name: 'Academic transcripts',
+    hint: 'Sealed and sent by your institution, not from your own copies.' },
+  { id: 'eval', name: 'Credential evaluation report',
+    hint: 'Course-by-course report from the assessing service.' },
+  { id: 'language', name: 'Language proficiency test',
+    hint: 'IELTS, CELPIP, OET or the equivalent your regulator accepts.' },
+  { id: 'practice', name: 'Proof of practice hours',
+    hint: 'Employer letters and a certificate of standing from your regulator.' },
+  { id: 'identity', name: 'Passport or identity document',
+    hint: 'Photo page, matching the name on every other document.' }
 ];
+
+/* ── Which documents each step needs before it can move ───────────────
+   Keyed by profession + country, then by step id. This is what connects
+   the sidebar to the timeline: a step with a missing or rejected
+   requirement is visibly waiting, and the sidebar only ever asks for the
+   documents this particular pathway actually uses.
+   ─────────────────────────────────────────────────────────────────── */
+CB.STEP_DOCS = {
+  'Registered Nurse|Canada': {
+    eval: ['transcripts'], language: ['language'], bridging: ['eval'],
+    nclex: ['eval', 'language', 'identity'],
+    registration: ['eval', 'language', 'practice', 'identity']
+  },
+  'Registered Nurse|United States': {
+    eval: ['transcripts'], nclex: ['eval', 'identity'],
+    licensure: ['eval', 'practice', 'identity'],
+    visascreen: ['eval', 'language', 'practice']
+  },
+  'Doctor / Physician|Canada': {
+    verify: ['transcripts'], mccqe1: ['eval', 'identity'], nac: ['eval', 'identity'],
+    carms: ['eval', 'practice'], licence: ['eval', 'practice', 'identity']
+  },
+  'Doctor / Physician|United States': {
+    ecfmg: ['transcripts'], step1: ['eval', 'identity'], step2: ['eval', 'identity'],
+    match: ['eval', 'practice'], step3: ['eval', 'identity'],
+    licence: ['eval', 'practice', 'identity']
+  },
+  'Civil Engineer|Canada': {
+    eval: ['transcripts'], application: ['eval', 'identity'], exams: ['eval'],
+    nppe: ['eval'], experience: ['practice'],
+    peng: ['eval', 'practice', 'identity']
+  },
+  'Civil Engineer|United States': {
+    eval: ['transcripts'], fe: ['eval', 'identity'], eit: ['eval', 'identity'],
+    experience: ['practice'], pe: ['eval', 'practice'],
+    licensure: ['eval', 'practice', 'identity']
+  },
+  'Teacher|Canada': {
+    eval: ['transcripts'], application: ['eval', 'identity'], language: ['language'],
+    practicum: ['eval', 'practice'],
+    certificate: ['eval', 'language', 'practice', 'identity']
+  },
+  'Teacher|United States': {
+    eval: ['transcripts'], exams: ['eval', 'identity'], background: ['identity'],
+    licensure: ['eval', 'practice', 'identity']
+  },
+  'Software Engineer|Canada': {
+    eval: ['transcripts'], language: ['language'],
+    workauth: ['eval', 'language', 'identity']
+  },
+  'Software Engineer|United States': {
+    eval: ['transcripts'], employer: ['practice', 'identity'],
+    workauth: ['eval', 'practice', 'identity']
+  }
+};
 
 /* ── Pathway templates ────────────────────────────────────────────────
    Each returns an ordered array of steps.
@@ -316,16 +378,33 @@ CB.trainedInLabel = function (profile) {
 CB.buildPathway = function (profile) {
   var byCountry = CB.PATHWAYS[profile.profession];
   var body = CB.BODIES[profile.region];
-  var steps = byCountry[profile.country](body).map(function (step) {
-    return Object.assign({}, step, { status: 'not-started', blockedBy: null, flag: null });
+  var reqs = CB.STEP_DOCS[profile.profession + '|' + profile.country] || {};
+
+  var steps = byCountry[profile.country](body).map(function (step, i) {
+    return Object.assign({}, step, {
+      status: 'not-started',
+      flag: null,
+      requires: reqs[step.id] || [],
+      /* The first step is the credential evaluation itself, so the report
+         landing on file is what completes it. Every other step needs
+         something this demo cannot observe. */
+      completeOnDocs: i === 0
+    });
   });
 
-  /* The applicant is already partway in: first step done, second underway. */
-  if (steps[0]) steps[0].status = 'complete';
-  if (steps[1]) steps[1].status = 'in-progress';
-  if (steps[2]) steps[2].status = 'upcoming';
+  if (steps[0]) steps[0].status = 'in-progress';
+  if (steps[1]) steps[1].status = 'upcoming';
 
   return steps;
+};
+
+/* The documents this pathway actually asks for, in the canonical order. */
+CB.requiredDocsFor = function (steps) {
+  var needed = {};
+  steps.forEach(function (s) {
+    (s.requires || []).forEach(function (id) { needed[id] = true; });
+  });
+  return CB.DOCUMENTS.filter(function (d) { return needed[d.id]; });
 };
 
 /* Is this pathway a licensing pathway at all? */

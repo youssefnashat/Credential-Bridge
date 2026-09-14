@@ -29,13 +29,25 @@
    this mode. It patches the locally built pathway instead:
    {
      entries:   [ { kind, title, body: [paragraph, ...] } ]   log entries
-     stepUpdates: [ { id, status, flag } ]        status changes to apply
-     insertAfter: { afterId, step } | null        a remediation step
-     blockFrom:   stepId | null                   block everything after it
-     docUpdates:  [ { id, status, tone } ]        sidebar document changes
-     tie:         { fromId, toId, label } | null  the conflict bracket
-     rebuild:     boolean                         regenerate the pathway
+     stepUpdates:  [ { id, status, flag } ]       status changes to apply
+     insertBefore: { beforeId, step } | null      a remediation step
+     docUpdates:   [ { id, status, tone } ]       sidebar document changes
+     tie:          { fromId, toId, label } | null the conflict bracket
+     rebuild:      boolean                        regenerate the pathway
    }
+
+   Steps blocked by a missing or rejected document are NOT listed here.
+   That follows from the documents themselves and is derived at render
+   time, so the timeline can never disagree with the sidebar.
+
+   Event types (document.* are mock-only: the /reason contract has no event
+   or field for documents, so live mode never sends them):
+     pathway.build       intake finished
+     document.uploaded   event.document, event.pathwayDocs
+     document.removed    event.document, event.pathwayDocs
+     conflict.simulate   event.documents
+     rejection.simulate  event.documents, event.targetDocId
+     pathway.reset
 
    Paragraph text supports two markers, applied after HTML escaping:
      **bold**   emphasis        `mono`   dates, counts, references
@@ -78,6 +90,20 @@
   function capitalize(text) {
     return text.charAt(0).toUpperCase() + text.slice(1);
   }
+  /* Documents a step needs that are not usable right now. */
+  function missingFor(step, documents) {
+    return (step.requires || []).filter(function (id) {
+      var d = documents.filter(function (x) { return x.id === id; })[0];
+      return !d || d.status === 'missing' || d.status === 'rejected';
+    });
+  }
+  /* Never surface a raw document id: fall back to the catalogue name. */
+  function docName(documents, id) {
+    var d = (documents || []).filter(function (x) { return x.id === id; })[0];
+    if (d && d.name) return d.name;
+    var def = CB.DOCUMENTS.filter(function (x) { return x.id === id; })[0];
+    return def ? def.name : id;
+  }
   function listNames(names) {
     if (!names.length) return 'nothing';
     if (names.length === 1) return names[0];
@@ -96,7 +122,7 @@
       var bridgeEnd = shift(240), decision = shift(330);
       return {
         from: 'language', to: 'registration', tie: 'language result expires',
-        doc: { id: 'language', status: 'Expiring', tone: 'amber' },
+        doc: { id: 'language', state: 'flagged', status: 'Expiring', tone: 'amber' },
         title: 'Language result expires before registration',
         body: [
           'Your IELTS Academic result was issued `' + fmt(issued) + '` and lapses `' + fmt(expiry) +
@@ -118,7 +144,7 @@
       var att = shift(-18), attExp = shift(72), decision = shift(118);
       return {
         from: 'nclex', to: 'licensure', tie: 'test window closes',
-        doc: { id: 'eval', status: 'In review', tone: 'amber' },
+        doc: { id: 'eval', state: 'flagged', status: 'In review', tone: 'amber' },
         title: 'Test window closes before the board decides',
         body: [
           'Your authorisation to test was issued `' + fmt(att) + '` and expires `' + fmt(attExp) +
@@ -189,7 +215,7 @@
       var exam = shift(142), result = shift(190);
       return {
         from: 'application', to: 'exams', tie: 'file lapses before exam',
-        doc: { id: 'eval', status: 'Time-limited', tone: 'amber' },
+        doc: { id: 'eval', state: 'flagged', status: 'Time-limited', tone: 'amber' },
         title: 'Licensure file lapses before the exam sitting',
         body: [
           'Your file with ' + b.engineering + ' was opened `' + fmt(opened) +
@@ -213,7 +239,7 @@
       var start = shift(-1332), anniversary = shift(128), regClose = shift(46), admin = shift(139);
       return {
         from: 'experience', to: 'pe', tie: 'experience short at cut-off',
-        doc: { id: 'practice', status: 'Short', tone: 'amber' },
+        doc: { id: 'practice', state: 'flagged', status: 'Short', tone: 'amber' },
         title: 'Experience falls short at the registration cut-off',
         body: [
           'The ' + b.engineering + ' credits your supervised experience from `' + fmt(start) +
@@ -239,7 +265,7 @@
       var start = shift(120), end = shift(268), assess = shift(300);
       return {
         from: 'language', to: 'practicum', tie: 'language result expires',
-        doc: { id: 'language', status: 'Expiring', tone: 'amber' },
+        doc: { id: 'language', state: 'flagged', status: 'Expiring', tone: 'amber' },
         title: 'Language result expires during the practicum',
         body: [
           'Your language test was sat `' + fmt(issued) + '` and lapses `' + fmt(expiry) +
@@ -263,7 +289,7 @@
       var examResult = shift(52), decision = shift(122);
       return {
         from: 'background', to: 'licensure', tie: 'clearance expires in queue',
-        doc: { id: 'practice', status: 'Expiring', tone: 'amber' },
+        doc: { id: 'practice', state: 'flagged', status: 'Expiring', tone: 'amber' },
         title: 'Clearance expires while the credential is in queue',
         body: [
           'Your fingerprint clearance was processed `' + fmt(printed) + '` and the ' + b.teaching +
@@ -288,7 +314,7 @@
       var expiry = shift(88), eca = shift(880), ita = shift(160);
       return {
         from: 'language', to: 'workauth', tie: 'profile goes stale',
-        doc: { id: 'language', status: 'Expiring', tone: 'amber' },
+        doc: { id: 'language', state: 'flagged', status: 'Expiring', tone: 'amber' },
         title: 'Express Entry profile goes stale',
         body: [
           'Worth stating plainly: there is no regulator anywhere in this pathway, so nothing here is a ' +
@@ -312,7 +338,7 @@
       var open = shift(58), close = shift(72), wd = shift(-40), ready = shift(96);
       return {
         from: 'employer', to: 'workauth', tie: 'filing window closes',
-        doc: { id: 'eval', status: 'In review', tone: 'amber' },
+        doc: { id: 'eval', state: 'flagged', status: 'In review', tone: 'amber' },
         title: 'Filing window closes before the package is ready',
         body: [
           'Worth stating plainly: no state board licenses software engineers, so there is no licensing conflict ' +
@@ -337,28 +363,51 @@
      Every pathway in this product opens with a credential evaluation, so
      that is the step the rejection lands on.
      ─────────────────────────────────────────────────────────────────── */
-  function rejectionRule(profile, b, steps) {
-    var first = steps[0] || {};
-    var agency = first.authority || 'the assessing service';
-    var received = shift(-11);
-    var replacement = shift(58);
-    return {
-      targetId: first.id || 'eval',
-      stepName: (first.title || 'credential evaluation').toLowerCase(),
-      agency: agency,
-      received: received,
-      replacement: replacement,
-      remedy: {
-        id: 'remedy',
-        title: 'Resubmit sealed transcripts',
-        authority: agency,
-        detail: 'Institution sends transcripts directly, unopened, quoting the existing file reference.',
-        months: 2,
-        status: 'in-progress',
-        isRemedy: true
-      }
-    };
-  }
+  /* Why a given document came back, and what fixes it. Keyed by document
+     type, because any of them can be the one that is returned. */
+  var REJECTIONS = {
+    transcripts: {
+      reason: 'they arrived in an envelope that had been opened before delivery, so they cannot be ' +
+              'treated as institution-issued',
+      remedyTitle: 'Resubmit sealed transcripts',
+      remedyDetail: 'Institution sends transcripts directly, unopened, quoting the existing file reference.',
+      fix: 'Ask your institution to send them directly to the assessing service, sealed and unopened. ' +
+           'Do not send copies from your own set, including certified copies — that is what caused the return.',
+      weeks: 8
+    },
+    eval: {
+      reason: 'the report was issued against transcripts the service has since been unable to verify at source',
+      remedyTitle: 'Reissue credential evaluation',
+      remedyDetail: 'Assessing service re-runs the evaluation once verified transcripts are on file.',
+      fix: 'The evaluation cannot be repaired on its own — the transcripts underneath it have to be ' +
+           'verified first, and the report is then reissued against them at no new assessment fee.',
+      weeks: 9
+    },
+    language: {
+      reason: 'the test centre reported an identity mismatch at the session and the board has cancelled the score',
+      remedyTitle: 'Re-sit the language test',
+      remedyDetail: 'New sitting booked, with identity documents matching the name on the application.',
+      fix: 'Book a new sitting and bring the same identity document your application is filed under. ' +
+           'Cancelled scores are not reinstated on appeal, so treat this as a retest, not a dispute.',
+      weeks: 6
+    },
+    practice: {
+      reason: 'the employer letters are unsigned and not on institutional letterhead, so the hours cannot be counted',
+      remedyTitle: 'Re-obtain practice verification',
+      remedyDetail: 'Signed letters on letterhead, plus a certificate of standing from your current regulator.',
+      fix: 'Ask each employer for a signed letter on letterhead stating your role, dates and hours, and ' +
+           'request a certificate of standing directly from your current regulator.',
+      weeks: 7
+    },
+    identity: {
+      reason: 'the passport had expired at the date of filing and the scan of the photo page was illegible',
+      remedyTitle: 'Resubmit identity document',
+      remedyDetail: 'Current passport, full photo page, scanned in colour at full size.',
+      fix: 'Submit a currently valid passport, scanned in colour at full page size. If the name differs ' +
+           'from your other documents, include the deed poll or marriage certificate that explains it.',
+      weeks: 3
+    }
+  };
 
   /* ═══════════════════════════════════════════════════════════════════
      mockReasoning(profile, event) — the offline demo, used only with ?mock=1.
@@ -373,9 +422,10 @@
     var steps = event.steps || [];
     var key = profile.profession + '|' + profile.country;
 
+    var documents = event.documents || [];
     var empty = {
-      entries: [], stepUpdates: [], insertAfter: null,
-      blockFrom: null, docUpdates: [], tie: null, rebuild: false
+      entries: [], stepUpdates: [], insertBefore: null,
+      docUpdates: [], tie: null, rebuild: false
     };
 
     /* ── Opening plan ──────────────────────────────────────────────── */
@@ -415,7 +465,11 @@
       }
 
       var terminalAuthority = terminal.authority;
-      var liveStep = steps[2] ? '`' + steps[2].title + '`' : 'the next step';
+      var needed = CB.requiredDocsFor(steps);
+      var firstNeeds = (steps[0].requires || []).map(function (id) {
+        return docName(needed, id);
+      });
+
       out.entries.push({
         kind: 'plan',
         title: 'Pathway mapped',
@@ -423,14 +477,17 @@
           'You trained as a ' + profile.profession.toLowerCase().replace(' / physician', '') +
           ' in ' + CB.trainedInLabel(profile) + ' and you are seeking recognition in ' + profile.region + ', ' +
           profile.country + '. That route runs through **' + terminalAuthority + '**, and I have mapped it ' +
-          'as **' + steps.length + ' steps**.',
+          'as **' + steps.length + ' steps**, ' + formatSpan(total) +
+          ' start to finish, assuming no re-sits and no document returns.',
 
-          'Start to finish, ' + formatSpan(total) + ', assuming no re-sits and no document returns. ' +
-          'Step one is complete and step two is underway, so the live question is ' + liveStep + '.',
+          'This pathway needs **' + needed.length + ' documents**, and nothing is on file yet. Every step is ' +
+          'waiting on at least one of them, which is why the timeline is greyed out. Start with ' +
+          listNames(firstNeeds) + ' — that is what step one is blocked on, and most of what follows is ' +
+          'blocked on step one.',
 
-          'The steps are not independent. Several of them carry documents that expire, and several can only be ' +
-          'taken in fixed sittings. That combination is where internationally educated applicants most often ' +
-          'lose a year, and it is what I check the file against.'
+          'The steps are not independent. Several of them carry documents that expire, and several can only ' +
+          'be taken in fixed sittings. That combination is where internationally educated applicants most ' +
+          'often lose a year, and it is what I check the file against as documents arrive.'
         ]
       });
       out.entries.push({
@@ -445,11 +502,88 @@
       return out;
     }
 
+    /* ── A document arrived ────────────────────────────────────────── */
+    if (event.type === 'document.uploaded') {
+      var up = event.document;
+      var freed = steps.filter(function (st) {
+        return (st.requires || []).indexOf(up.id) >= 0 && !missingFor(st, documents).length;
+      });
+      var stillWaiting = steps.filter(function (st) { return missingFor(st, documents).length; });
+      var outstanding = CB.requiredDocsFor(steps).filter(function (d) {
+        var live = documents.filter(function (x) { return x.id === d.id; })[0];
+        return !live || live.status === 'missing' || live.status === 'rejected';
+      });
+
+      var lines = ['I have logged `' + up.file.name + '` against **' + up.name + '**.'];
+
+      if (freed.length) {
+        lines.push('That clears ' + listNames(freed.map(function (st) { return st.title; })) +
+          '. ' + (freed.length === 1 ? 'It has' : 'They have') +
+          ' everything ' + (freed.length === 1 ? 'it' : 'they') + ' needs from you.');
+      } else {
+        lines.push('No step clears on this alone — every step that uses it still needs something else too.');
+      }
+
+      if (outstanding.length) {
+        lines.push('**Still outstanding:** ' + listNames(outstanding.map(function (d) { return d.name; })) +
+          '. ' + stillWaiting.length + ' of ' + steps.length + ' steps are waiting on those.');
+      } else {
+        lines.push('**That is the full set.** Nothing in this pathway is waiting on paperwork any more. ' +
+          'From here the constraints are examination calendars and regulator queues, not your file.');
+      }
+
+      return Object.assign({}, empty, {
+        entries: [{ kind: 'document', title: up.name + ' received', body: lines }]
+      });
+    }
+
+    /* ── A document was withdrawn ──────────────────────────────────── */
+    if (event.type === 'document.removed') {
+      var gone = event.document;
+      var reblocked = steps.filter(function (st) {
+        return (st.requires || []).indexOf(gone.id) >= 0;
+      });
+      return Object.assign({}, empty, {
+        entries: [{
+          kind: 'document',
+          title: gone.name + ' removed',
+          body: [
+            'Removed from the case file. ' + (reblocked.length
+              ? listNames(reblocked.map(function (st) { return st.title; })) +
+                ' ' + (reblocked.length === 1 ? 'is' : 'are') + ' waiting again.'
+              : 'No step in this pathway depended on it.')
+          ]
+        }]
+      });
+    }
+
     /* ── Schedule / prerequisite conflict ──────────────────────────── */
     if (event.type === 'conflict.simulate') {
       var rule = CONFLICTS[key];
       if (!rule) return empty;
       var c = rule(profile, b);
+
+      /* Most of these conflicts are read off a document's dates. Without
+         the document there is nothing to read, and inventing an expiry
+         would be worse than saying so. */
+      if (c.doc) {
+        var basis = documents.filter(function (d) { return d.id === c.doc.id; })[0];
+        if (!basis || basis.status === 'missing' || basis.status === 'rejected') {
+          return Object.assign({}, empty, {
+            entries: [{
+              kind: 'watch',
+              title: 'Nothing to check yet',
+              body: [
+                'The collision I would be watching for on this pathway turns on the dates inside your **' +
+                docName(documents, c.doc.id).toLowerCase() + '**, and that is not on file.',
+
+                'Upload it and I will check it against ' + titleOf(steps, c.to) +
+                ' straight away. I am not going to guess at an expiry date.'
+              ]
+            }]
+          });
+        }
+      }
 
       var fromTitle = titleOf(steps, c.from);
       var toTitle = titleOf(steps, c.to);
@@ -460,8 +594,7 @@
           { id: c.from, status: 'at-risk', flag: 'Conflicts with “' + toTitle + '”. See the agent log.' },
           { id: c.to,   status: 'at-risk', flag: 'Depends on “' + fromTitle + '” staying valid.' }
         ],
-        insertAfter: null,
-        blockFrom: null,
+        insertBefore: null,
         docUpdates: c.doc ? [c.doc] : [],
         tie: { fromId: c.from, toId: c.to, label: c.tie },
         rebuild: false
@@ -470,45 +603,58 @@
 
     /* ── Document rejection ────────────────────────────────────────── */
     if (event.type === 'rejection.simulate') {
-      var r = rejectionRule(profile, b, steps);
+      var target = documents.filter(function (d) { return d.id === event.targetDocId; })[0];
+      if (!target || target.status === 'missing') return empty;
 
-      var held = steps.filter(function (s) {
-        return s.status !== 'complete' && s.id !== r.targetId;
-      }).map(function (s) { return s.title; });
+      var rj = REJECTIONS[target.id] || REJECTIONS.transcripts;
+      var received = shift(-11);
+      var replacement = shift(rj.weeks * 7);
+
+      /* Which steps this actually costs, in pathway order. */
+      var affected = steps.filter(function (st) {
+        return (st.requires || []).indexOf(target.id) >= 0;
+      });
+      var assessor = affected[0] ? affected[0].authority : 'the assessing service';
+
+      var remedy = {
+        id: 'remedy',
+        title: rj.remedyTitle,
+        authority: assessor,
+        detail: rj.remedyDetail,
+        months: Math.max(1, Math.round(rj.weeks / 4)),
+        status: 'in-progress',
+        requires: [],
+        completeOnDocs: false,
+        isRemedy: true
+      };
 
       return {
         entries: [{
           kind: 'rejection',
-          title: capitalize(r.stepName) + ' returned',
+          title: target.name + ' returned',
           body: [
-            capitalize(r.agency) + ' has returned your ' + r.stepName + '. The transcripts supporting it arrived `' +
-            fmt(r.received) + '` in an envelope that had been opened before delivery, so they cannot be ' +
-            'treated as institution-issued. **The report is void. The file is not.**',
+            capitalize(assessor) + ' has returned your ' + target.name.toLowerCase() + ' — `' +
+            target.file.name + '`, filed `' + target.file.added + '`. On review `' + fmt(received) +
+            '`, ' + rj.reason + '. **The document is void. The file is not.**',
 
-            'Every step after this one depends on a verified credential record, so I have held **' + held.length +
-            ' downstream ' + (held.length === 1 ? 'step' : 'steps') + '** — ' + listNames(held) +
-            '. They are waiting, not lost. Nothing you have already paid for has been forfeited.',
+            affected.length
+              ? 'That puts **' + affected.length + ' ' + (affected.length === 1 ? 'step' : 'steps') +
+                '** back to waiting — ' + listNames(affected.map(function (st) { return st.title; })) +
+                '. They are waiting, not lost, and nothing you have already paid for has been forfeited.'
+              : 'No step in this pathway lists it as a requirement, so nothing downstream stalls. Replace ' +
+                'it at your own pace.',
 
-            '**Recommendation.** Ask your institution to send transcripts directly to ' + r.agency +
-            ', sealed and unopened, quoting file reference `' + profile.caseRef +
-            '`. On their stated turnaround that puts a replacement report at `' + fmt(r.replacement) +
-            '`. Do not send copies from your own set, including certified copies — that is exactly what ' +
-            'caused the return.',
+            '**Recommendation.** ' + rj.fix + ' Quote file reference `' + profile.caseRef +
+            '`. On the stated turnaround that puts a replacement at `' + fmt(replacement) + '`, about **' +
+            rj.weeks + ' weeks** from now.',
 
-            'I have inserted the resubmission as a step of its own so the delay is visible in the timeline ' +
-            'rather than hidden inside step one.'
+            'I have put the resubmission in the timeline as a step of its own, so the delay is visible ' +
+            'rather than hidden inside whatever it is holding up.'
           ]
         }],
-        stepUpdates: [
-          { id: r.targetId, status: 'at-risk',
-            flag: 'Returned ' + fmt(r.received) + ' — transcripts were not institution-sealed.' }
-        ],
-        insertAfter: { afterId: r.targetId, step: r.remedy },
-        blockFrom: 'remedy',
-        docUpdates: [
-          { id: 'eval', status: 'Rejected', tone: 'rust' },
-          { id: 'transcripts', status: 'Resend', tone: 'amber' }
-        ],
+        stepUpdates: [],
+        insertBefore: affected.length ? { beforeId: affected[0].id, step: remedy } : null,
+        docUpdates: [{ id: target.id, state: 'rejected', status: 'Returned', tone: 'rust' }],
         tie: null,
         rebuild: false
       };
@@ -522,10 +668,10 @@
           title: 'Case reset',
           body: [
             'Simulated events cleared. The pathway is back to the plan I generated for ' + profile.name +
-            ' at intake, and all documents are showing as verified again.'
+            ' at intake. Your uploaded documents are untouched — any that were returned are back on file.'
           ]
         }],
-        stepUpdates: [], insertAfter: null, blockFrom: null,
+        stepUpdates: [], insertBefore: null,
         docUpdates: [], tie: null, rebuild: true
       };
     }
@@ -700,6 +846,9 @@
   CB.getAgentReasoning = function (profile, event) {
     if (CB.MOCK) {
       try { return Promise.resolve(mockReasoning(profile, event)); } catch (e) { return Promise.reject(e); }
+    }
+    if (!EVENTS[event.type]) {
+      return Promise.reject(new Error('The /reason contract has no event for ' + event.type + '.'));
     }
     return liveReasoning(profile, event);
   };
