@@ -27,3 +27,9 @@ files from two lanes is sequenced by the orchestrator (one lane finishes, the ne
 4. Need a file outside your lane, found new work, or blocked → SendMessage `NEED T#: …` and wait. Don't edit it.
 5. Use `backend/.venv/bin/python`. Do not `pip install` into the shared venv — use a scratch venv.
 6. No AWS calls until the orchestrator announces H1 cleared. Never push, deploy, publish, or submit.
+
+## Budget mode (from 2026-09-13 late evening — user asked to be mindful of tokens)
+- Idle lanes stay idle; the orchestrator only messages a lane when assigning a task. Don't poll, don't send FYIs.
+- DONE reports ≤ 12 lines: files · proof tail · new (one line each).
+- Orchestrator runs mechanical checks itself; one batched reviewer (cheaper model) covers judgment probes for several tasks at once instead of one full reviewer per task.
+- No new P2 work until the deadline path (Bedrock live run → eval → video) is unblocked.
