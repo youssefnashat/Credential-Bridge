@@ -5,6 +5,8 @@ import argparse, json, sys, time
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "backend"))
+from dotenv import load_dotenv
+load_dotenv(ROOT / "backend" / ".env", override=False)   # provider/model settings, before the harvester import
 from kb.pipeline import kb_store
 
 def main():
@@ -20,6 +22,7 @@ def main():
             print(f"skip {jur}/{prof} (already in KB)"); continue
         tried += 1
         try:
+            kb_store.ruleset_path(prof, jur)          # refuse a bad key before a model call
             rs = harvest(prof, jur, item["regulator"], item["url"], agent=agent)
             kb_store.write_harvested(rs, prof, jur)   # validates before writing; forces needs_review
             print(f"harvested {jur}/{prof} conf={rs.get('confidence')} review=True")
