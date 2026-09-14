@@ -13,26 +13,31 @@ Detailed beat plan + command sheet: `docs/VIDEO_SCRIPT.md`.
 - [ ] Record: **Cmd+Shift+5** → Options → Microphone. One clip per part; speed up agent waits in the edit.
 
 **Rule:** where it says *[read from screen]*, say what the agent actually returned on that take — never a scripted date.
-**Delivery:** slow down in Part 1. Pause for a beat after the lines in **bold** — those are the ones judges should remember.
+**Delivery:** read each part once, then say it in your own words. It should sound like you explaining your project to a friend, not reading. Small stumbles are fine.
 
 ---
 
 ## Part 1 — Slides 1–5 (0:00–1:20)
 
-**Slide 1 · Title** (0:00–0:12) — the hook
-> "Imagine being a nurse with years of experience — and not being allowed to work as one. For many people who trained in one country and move to another, that's where they start. This is Credential Bridge, built with the Strands Agents SDK for the Agents for Humans hackathon."
+Devpost asks the pitch to cover three things. Each one is said out loud below, plainly, so judges can't miss it:
+**(1) the problem** → slide 2 · **(2) who it's for** → slide 3 · **(3) why it matters** → slide 4.
 
-**Slide 2 · The licensing maze** (0:12–0:47) — **(1) the problem**
-> "The rules aren't secret. The problem is that they're a maze. To practise again, a nurse, doctor, engineer or teacher has to clear a chain of steps set by the regulator where they move — credential assessments, language tests, exams, supervised practice, background checks. Every profession and every province, state and country orders them differently. **And every step runs on its own clock.** In Ontario, a nurse's language test has to still be valid when the College makes its decision. Her police check expires six months after it's issued. **So a delay in one step can quietly expire a document in another.** And when that happens, she doesn't just wait — she pays again, redoes the step, and loses months."
+**Slide 1 · Title** (0:00–0:10)
+> "Hi, we're Kanwar and Youssef, and this is Credential Bridge. We built it for the Agents for Humans hackathon, in the Good Neighbor track. It's an AI agent, built with Strands, that helps people who trained in another country work out how to get licensed again."
 
-**Slide 3 · Two groups, one pathway** (0:47–1:05) — **(2) who it's for**
-> "Today, the people trying to catch these collisions are settlement caseworkers — nonprofit staff guiding dozens of clients at once, across different professions and jurisdictions, from checklists and regulator websites that keep changing. **A checklist tells you what to do. It can't tell you that two of your steps are about to collide.**"
+**Slide 2 · The licensing maze** (0:10–0:45) — **(1) the problem**
+> "So here's the problem. If you're a nurse, a doctor, an engineer or a teacher and you move to a new country, you usually can't just start working. You have to get licensed again by the local regulator. That means a lot of steps: getting your education assessed, a language test, an application, exams, a background check. They have to happen in a certain order, and that order is different depending on your job and where you're moving to.
+>
+> The part that really hurts people is timing, because some of these documents expire. For a nurse in Ontario, the police check is only good for six months, and the language test still has to be valid when the College makes its decision. So if one step gets delayed, something else can expire, and you end up paying for it again and waiting months longer. This slide is one example: a nurse moving to Ontario. That's nine steps."
 
-**Slide 4 · Unlocking expertise** (1:05–1:17) — **(3) why it matters**
-> "And the cost lands on everyone. Nursing, engineering and teaching are exactly the professions communities are short of — while the people already trained to do that work wait, or take survival jobs because the path back was too hard to follow. **That's lost income for families, lost skills for communities, and lost time no one gets back.**"
+**Slide 3 · Two groups, one pathway** (0:45–1:02) — **(2) who it's for**
+> "We built this for two groups. First, the people going through it. Second, the caseworkers at settlement agencies and nonprofits who help them. A caseworker can have dozens of clients, all in different jobs and different provinces, and they're mostly working from checklists. A checklist tells you what the steps are, but it won't warn you when two of them are about to clash."
 
-**Slide 5 · Live demo** (1:17–1:20)
-> "Credential Bridge is an agent built to catch those collisions before they cost someone months. Let's follow one real case."
+**Slide 4 · Unlocking expertise** (1:02–1:15) — **(3) why it matters**
+> "Why does this matter? A lot of these are jobs we're short of people for, like nurses and engineers. When the process is this hard, qualified people end up waiting a long time, or working jobs well below what they trained for. Getting the pathway right saves them time and money, and it means one caseworker can help more people."
+
+**Slide 5 · Live demo** (1:15–1:20)
+> "So let me show you how it works with a real case."
 
 ---
 
