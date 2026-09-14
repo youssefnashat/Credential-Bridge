@@ -2,7 +2,7 @@
 Usage: python kb/pipeline/run_harvest.py --profession "Registered Nurse" --jurisdiction CA-ON \
          --regulator "College of Nurses of Ontario (CNO)" --url https://www.cno.org/...
 Writes kb/store/<jurisdiction>/<profession-slug>.json (agent tier)."""
-import argparse, json, sys
+import argparse, sys
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT)); sys.path.insert(0, str(ROOT / "backend"))
@@ -14,9 +14,8 @@ def main():
     args = ap.parse_args()
     from app.agents.harvester import harvest   # imported lazily so no AWS import at module load
     rs = harvest(args.profession, args.jurisdiction, args.regulator, args.url)
-    out = kb_store.KB_ROOT / args.jurisdiction / (args.profession.lower().replace(" ","-").replace("/","-") + ".json")
-    out.parent.mkdir(parents=True, exist_ok=True); out.write_text(json.dumps(rs, indent=2))
-    print(f"wrote {out} (confidence={rs.get('confidence')}, needs_review={rs.get('needs_review')})")
+    out = kb_store.write_harvested(rs, args.profession, args.jurisdiction)   # validates before writing
+    print(f"wrote {out} (confidence={rs.get('confidence')}, needs_review=True)")
     errs = kb_store.validate_all()
     print("KB valid" if not errs else f"KB errors: {errs}")
 

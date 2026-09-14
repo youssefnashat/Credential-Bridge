@@ -12,16 +12,17 @@ def main():
     a = ap.parse_args()
     from app.agents.harvester import build_harvester, harvest
     q = [json.loads(l) for l in (ROOT/"kb"/"sources"/"harvest_queue.jsonl").read_text().splitlines() if l.strip()]
-    agent = build_harvester(); done = 0
-    for item in q[:a.limit]:
+    agent = build_harvester(); done = tried = 0
+    for item in q:
+        if tried >= a.limit: break              # --limit counts harvest attempts, not queue rows
         prof, jur = item["profession"], item["jurisdiction"]
         if kb_store.get(prof, jur) and not a.force:
             print(f"skip {jur}/{prof} (already in KB)"); continue
+        tried += 1
         try:
             rs = harvest(prof, jur, item["regulator"], item["url"], agent=agent)
-            out = kb_store.KB_ROOT / jur / (prof.lower().replace(" ","-").replace("/","-")+".json")
-            out.parent.mkdir(parents=True, exist_ok=True); out.write_text(json.dumps(rs, indent=2))
-            print(f"harvested {jur}/{prof} conf={rs.get('confidence')} review={rs.get('needs_review')}")
+            kb_store.write_harvested(rs, prof, jur)   # validates before writing; forces needs_review
+            print(f"harvested {jur}/{prof} conf={rs.get('confidence')} review=True")
             done += 1; time.sleep(1)
         except Exception as e:
             print(f"FAILED {jur}/{prof}: {e}")
