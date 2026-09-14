@@ -1,8 +1,13 @@
-strands-agents>=1.0
-strands-agents-tools>=0.2
-fastapi>=0.111
-uvicorn[standard]>=0.30
-pydantic>=2.7
-boto3>=1.35
-python-dotenv>=1.0
-bedrock-agentcore>=0.1
+# Pinned to the versions verified working in backend/.venv (Python 3.11) on 2026-09-13.
+# strands-agents-tools is intentionally NOT listed: nothing in backend/ imports strands_tools.
+# harvester.py's web_fetch comes from the `web-fetch` extra below (strands.vended_tools), not
+# strands-agents-tools; it falls back to plain http_request (stdlib) if bs4/markdownify aren't present.
+strands-agents[anthropic,web-fetch]==1.55.1
+bedrock-agentcore==1.23.0
+jsonschema>=4.20,<5
+botocore[crt]>=1.43,<2       # [crt] needed for local `aws login` SSO/OAuth sessions; harmless inside AgentCore
+fastapi>=0.111,<1
+uvicorn[standard]>=0.30,<1
+pydantic>=2.7,<3
+boto3>=1.35,<2
+python-dotenv>=1.0,<2
