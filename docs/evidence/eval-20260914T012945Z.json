@@ -1,0 +1,1115 @@
+{
+  "generated_at": "20260914T012945Z",
+  "base_url": "http://localhost:8010",
+  "kb_url_count": 43,
+  "summary_line": "7/7 scenarios passed all checks · 7/7 contract-valid · sourced 95% (52/55 steps in contract-valid responses cite a URL from the target jurisdiction's curated ruleset; 0 off-jurisdiction, 0 off-ruleset, 0 off-KB, 3 uncited) · delay/rejection/unregulated judgments 3/3 · build/reset flag=false 4/4",
+  "warning": null,
+  "all_passed": true,
+  "totals": {
+    "scenarios": 7,
+    "passed": 7,
+    "valid": 7,
+    "steps": 55,
+    "sourced": 52,
+    "off_jurisdiction": 0,
+    "off_ruleset": 0,
+    "off_kb": 0,
+    "null": 3,
+    "regulator_url_bad": 0,
+    "dependents_without_upstream": 0,
+    "sourced_rate_all_steps": 0.9455,
+    "sourced_rate_cited_steps": 1.0,
+    "judgments_ok": 3,
+    "judgments": 3,
+    "flag_checks_ok": 4,
+    "flag_checks": 4
+  },
+  "scenarios": [
+    {
+      "id": "rn-on-build",
+      "event": "build_pathway",
+      "check": "build",
+      "request": {
+        "profile": {
+          "name": "Aida Torres",
+          "profession": "Registered Nurse",
+          "countryTrained": "Philippines",
+          "targetCountry": "Canada",
+          "targetRegion": "Ontario"
+        },
+        "event": "build_pathway",
+        "currentSteps": []
+      },
+      "http_status": 200,
+      "elapsed_ms": 37756,
+      "response": {
+        "steps": [
+          {
+            "id": 1,
+            "title": "Authorization to Work in Canada",
+            "status": "in-progress",
+            "detail": "Obtain and maintain valid proof of Canadian citizenship, permanent residency, or a work/study permit that authorizes nursing practice in Ontario. CNO requires this document to be unexpired when submitted. Without it, CNO holds the application open for up to two years, or registers Aida with a condition preventing practice. Confirm current immigration status before submitting the CNO application.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/authorization-to-work"
+          },
+          {
+            "id": 2,
+            "title": "Educational Credential Assessment (ECA)",
+            "status": "upcoming",
+            "detail": "Submit nursing transcripts and educational documents to a CNO-approved ECA provider — WES, ICAS, or ICES (BCIT). CNO must receive the ECA report directly from the provider before Aida can submit a registration application. Allow approximately 3–5 months for processing. Target submission: 2026-10-01; expected CNO receipt: 2027-02-01. CNO also accepts NNAS expedited reports prepared by CGFNS/TruMerit. No expiry period applies to the ECA report itself.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 3,
+            "title": "Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+            "status": "upcoming",
+            "detail": "Complete an accepted English-language proficiency test. CELBAN is nursing-specific and widely used. The result must be valid (within 24 months) at the date CNO makes its registration decision — not merely at the date of application. Recommended test date: 2026-11-01. A 2026-11-01 result expires 2028-11-01, providing a comfortable buffer through the anticipated registration decision in mid-2027. Do NOT test too early: a result taken before 2025-09-14 would already be expired today.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://cno.org/become-a-nurse/registration-requirements/proficiency-in-english-or-french/accepted-language-proficiency-tests"
+          },
+          {
+            "id": 4,
+            "title": "Evidence of Practice (within the past three years)",
+            "status": "upcoming",
+            "detail": "Demonstrate paid RN practice, or completion of nursing education, within the three years immediately preceding the registration decision. For practice outside Ontario, Aida's employer must send a Verification of Nursing Practice form and her Philippine Nursing Board regulator must send a Verification of Registration form directly to CNO. Ensure these cover practice up to at least 2024-09-14 (three years before the expected 2027 decision window). Gather documents now while employment records are accessible.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/evidence-of-practice"
+          },
+          {
+            "id": 5,
+            "title": "Transition to Practice (TTP) Requirement",
+            "status": "upcoming",
+            "detail": "All internationally educated RN applicants must meet the CNO Transition to Practice requirement. Options: (a) a Canadian nursing degree/diploma, (b) nursing practice in Canada within the past three years, or (c) a CNO-approved TTP course (valid five years from completion) or a school Education Pathway program (valid three years). As Aida is newly arrived from the Philippines, she will most likely need to complete a CNO-approved TTP course. Research approved TTP providers early — popular cohorts fill quickly. Target TTP completion: 2027-03-01. A 2027-03-01 completion date gives a valid TTP until 2032-03-01, well within the registration decision window.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/transition-to-practice"
+          },
+          {
+            "id": 6,
+            "title": "CNO Registration Application",
+            "status": "not-started",
+            "detail": "Once CNO has received the ECA report (expected 2027-02-01), Aida submits the registration application herself directly to CNO. The application triggers CNO's review of all requirements: language proficiency, evidence of practice, TTP, authorization to work, and the criminal record check. Target application submission: 2027-02-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          },
+          {
+            "id": 7,
+            "title": "Jurisprudence Examination (RN)",
+            "status": "not-started",
+            "detail": "Open-book, online exam covering Ontario nursing laws, CNO by-laws, regulations, practice standards, and guidelines. Can be written any time after CNO confirms applicant status — including during the application review period. Must be paid for and completed within 30 days of fee payment; can be retaken as needed. No expiry on the result. Target completion: 2027-03-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/jurisprudence-examination"
+          },
+          {
+            "id": 8,
+            "title": "Police Criminal Record Check (Sterling Backcheck)",
+            "status": "not-started",
+            "detail": "Obtain a police criminal record check exclusively through Sterling Backcheck (the only provider CNO accepts). This check is valid for six months from issue. Do NOT order it too early — if it expires before CNO's registration decision it must be redone. Recommended order date: 2027-03-01 (targeting a result by 2027-03-15, valid until 2027-09-15, which covers the anticipated registration decision). CNO recommends getting it near the end of the process, after the application is submitted.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/past-offences-and-findings--health-and-conduct/police-criminal-record-check"
+          },
+          {
+            "id": 9,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "National licensure examination administered by NCSBN. Aida must first receive eligibility confirmation from CNO before registering with NCSBN to sit the exam. After CNO declares eligibility (expected 2027-04-01), schedule and write the NCLEX-RN. Target exam date: 2027-05-01. Passing the NCLEX-RN is the final clinical competency gate before CNO issues the certificate of registration.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 10,
+            "title": "CNO Certificate of Registration Issued",
+            "status": "not-started",
+            "detail": "Upon successful completion of all requirements — ECA, language proficiency, evidence of practice, TTP, jurisprudence exam, criminal record check, NCLEX-RN, and valid authorization to work — CNO issues Aida's certificate of registration as a Registered Nurse in Ontario. Estimated issuance: 2027-06-01. Aida may then practice as an RN in Ontario.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          }
+        ],
+        "logEntry": {
+          "text": "Pathway built for Aida Torres — internationally educated Registered Nurse (Philippines) seeking CNO registration in Ontario, Canada. Today is 2026-09-14. The College of Nurses of Ontario (CNO) regulates RN practice in Ontario.\n\nEstimated timeframe: approximately 9–12 months from today, with a realistic registration target of 2027-06-01.\n\nPlan summary (10 steps in dependency order):\n1. Authorization to Work — confirm valid immigration status immediately; CNO cannot issue a certificate to someone without valid work authorization.\n2. Educational Credential Assessment (ECA) — submit to WES, ICAS, or ICES (BCIT) by 2026-10-01; CNO receipt expected 2027-02-01. This gates the registration application.\n3. Language Proficiency Test — write IELTS Academic, CELBAN, or OET by 2026-11-01; result valid until 2028-11-01, safely covering the 2027 registration decision. CRITICAL: the test must remain valid (within 24 months) at the CNO decision date, not just at application.\n4. Evidence of Practice — collect employer and regulator verification forms covering RN practice up to at least 2024-09-14.\n5. Transition to Practice (TTP) — as a newly arrived internationally educated nurse, Aida will most likely need a CNO-approved TTP course; target completion 2027-03-01 (valid five years to 2032-03-01).\n6. CNO Registration Application — submit by 2027-02-15 once CNO has received the ECA report.\n7. Jurisprudence Examination — complete the open-book online exam by 2027-03-15 after CNO confirms applicant status.\n8. Police Criminal Record Check (Sterling Backcheck only) — order 2027-03-01, valid six months to 2027-09-15; ordering too early risks expiry before the registration decision.\n9. NCLEX-RN — write after receiving CNO eligibility confirmation; target 2027-05-01.\n10. CNO Certificate of Registration — estimated issuance 2027-06-01 upon all requirements satisfied.\n\nKey risk to watch: the language test's 24-month validity window. If the ECA or TTP timelines slip and the registration decision is delayed past 2028-11-01 (if testing on 2026-11-01), Aida would need to retest. Monitor actively.",
+          "flag": false
+        },
+        "regulator": "College of Nurses of Ontario (CNO)",
+        "regulatorUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+      },
+      "scores": {
+        "contract": {
+          "ok": true,
+          "problems": []
+        },
+        "grounding": {
+          "steps": 10,
+          "sourced": 10,
+          "off_jurisdiction": 0,
+          "off_ruleset": 0,
+          "off_kb": 0,
+          "null": 0,
+          "bad_urls": [],
+          "regulator_url": "sourced",
+          "ok": true,
+          "target_ruleset_url_count": 11
+        },
+        "semantics": {
+          "ok": true,
+          "checks": {
+            "flag_false": true
+          },
+          "problems": []
+        }
+      },
+      "no_upstream": false,
+      "passed": true
+    },
+    {
+      "id": "rn-on-delay",
+      "event": "simulate_delay",
+      "check": "delay",
+      "request": {
+        "profile": {
+          "name": "Aida Torres",
+          "profession": "Registered Nurse",
+          "countryTrained": "Philippines",
+          "targetCountry": "Canada",
+          "targetRegion": "Ontario"
+        },
+        "event": "simulate_delay",
+        "currentSteps": [
+          {
+            "id": 1,
+            "title": "Authorization to Work in Canada",
+            "status": "in-progress",
+            "detail": "Obtain and maintain valid proof of Canadian citizenship, permanent residency, or a work/study permit that authorizes nursing practice in Ontario. CNO requires this document to be unexpired when submitted. Without it, CNO holds the application open for up to two years, or registers Aida with a condition preventing practice. Confirm current immigration status before submitting the CNO application.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/authorization-to-work"
+          },
+          {
+            "id": 2,
+            "title": "Educational Credential Assessment (ECA)",
+            "status": "upcoming",
+            "detail": "Submit nursing transcripts and educational documents to a CNO-approved ECA provider — WES, ICAS, or ICES (BCIT). CNO must receive the ECA report directly from the provider before Aida can submit a registration application. Allow approximately 3–5 months for processing. Target submission: 2026-10-01; expected CNO receipt: 2027-02-01. CNO also accepts NNAS expedited reports prepared by CGFNS/TruMerit. No expiry period applies to the ECA report itself.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 3,
+            "title": "Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+            "status": "upcoming",
+            "detail": "Complete an accepted English-language proficiency test. CELBAN is nursing-specific and widely used. The result must be valid (within 24 months) at the date CNO makes its registration decision — not merely at the date of application. Recommended test date: 2026-11-01. A 2026-11-01 result expires 2028-11-01, providing a comfortable buffer through the anticipated registration decision in mid-2027. Do NOT test too early: a result taken before 2025-09-14 would already be expired today.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://cno.org/become-a-nurse/registration-requirements/proficiency-in-english-or-french/accepted-language-proficiency-tests"
+          },
+          {
+            "id": 4,
+            "title": "Evidence of Practice (within the past three years)",
+            "status": "upcoming",
+            "detail": "Demonstrate paid RN practice, or completion of nursing education, within the three years immediately preceding the registration decision. For practice outside Ontario, Aida's employer must send a Verification of Nursing Practice form and her Philippine Nursing Board regulator must send a Verification of Registration form directly to CNO. Ensure these cover practice up to at least 2024-09-14 (three years before the expected 2027 decision window). Gather documents now while employment records are accessible.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/evidence-of-practice"
+          },
+          {
+            "id": 5,
+            "title": "Transition to Practice (TTP) Requirement",
+            "status": "upcoming",
+            "detail": "All internationally educated RN applicants must meet the CNO Transition to Practice requirement. Options: (a) a Canadian nursing degree/diploma, (b) nursing practice in Canada within the past three years, or (c) a CNO-approved TTP course (valid five years from completion) or a school Education Pathway program (valid three years). As Aida is newly arrived from the Philippines, she will most likely need to complete a CNO-approved TTP course. Research approved TTP providers early — popular cohorts fill quickly. Target TTP completion: 2027-03-01. A 2027-03-01 completion date gives a valid TTP until 2032-03-01, well within the registration decision window.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/transition-to-practice"
+          },
+          {
+            "id": 6,
+            "title": "CNO Registration Application",
+            "status": "not-started",
+            "detail": "Once CNO has received the ECA report (expected 2027-02-01), Aida submits the registration application herself directly to CNO. The application triggers CNO's review of all requirements: language proficiency, evidence of practice, TTP, authorization to work, and the criminal record check. Target application submission: 2027-02-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          },
+          {
+            "id": 7,
+            "title": "Jurisprudence Examination (RN)",
+            "status": "not-started",
+            "detail": "Open-book, online exam covering Ontario nursing laws, CNO by-laws, regulations, practice standards, and guidelines. Can be written any time after CNO confirms applicant status — including during the application review period. Must be paid for and completed within 30 days of fee payment; can be retaken as needed. No expiry on the result. Target completion: 2027-03-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/jurisprudence-examination"
+          },
+          {
+            "id": 8,
+            "title": "Police Criminal Record Check (Sterling Backcheck)",
+            "status": "not-started",
+            "detail": "Obtain a police criminal record check exclusively through Sterling Backcheck (the only provider CNO accepts). This check is valid for six months from issue. Do NOT order it too early — if it expires before CNO's registration decision it must be redone. Recommended order date: 2027-03-01 (targeting a result by 2027-03-15, valid until 2027-09-15, which covers the anticipated registration decision). CNO recommends getting it near the end of the process, after the application is submitted.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/past-offences-and-findings--health-and-conduct/police-criminal-record-check"
+          },
+          {
+            "id": 9,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "National licensure examination administered by NCSBN. Aida must first receive eligibility confirmation from CNO before registering with NCSBN to sit the exam. After CNO declares eligibility (expected 2027-04-01), schedule and write the NCLEX-RN. Target exam date: 2027-05-01. Passing the NCLEX-RN is the final clinical competency gate before CNO issues the certificate of registration.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 10,
+            "title": "CNO Certificate of Registration Issued",
+            "status": "not-started",
+            "detail": "Upon successful completion of all requirements — ECA, language proficiency, evidence of practice, TTP, jurisprudence exam, criminal record check, NCLEX-RN, and valid authorization to work — CNO issues Aida's certificate of registration as a Registered Nurse in Ontario. Estimated issuance: 2027-06-01. Aida may then practice as an RN in Ontario.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          }
+        ]
+      },
+      "http_status": 200,
+      "elapsed_ms": 82330,
+      "response": {
+        "steps": [
+          {
+            "id": 1,
+            "title": "Authorization to Work in Canada",
+            "status": "in-progress",
+            "detail": "Obtain and maintain valid proof of Canadian citizenship, permanent residency, or a work/study permit that authorizes nursing practice in Ontario. CNO requires this document to be unexpired when submitted. Without it, CNO holds the application open for up to two years, or registers Aida with a condition preventing practice. Confirm current immigration status before submitting the CNO application.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/authorization-to-work"
+          },
+          {
+            "id": 2,
+            "title": "Educational Credential Assessment (ECA)",
+            "status": "at-risk",
+            "detail": "⚠️ DELAY DETECTED. ECA submitted 2026-10-01 as planned, but processing has taken 7 months — CNO is now not expected to receive the report until 2027-05-01 (was 2027-02-01, a slip of +3 months). This is within the documented worst-case processing range when providers request additional documents. No expiry applies to the ECA report itself, but this slip cascades into every downstream step. Immediate action: contact the ECA provider (WES / ICAS / ICES-BCIT) to confirm receipt of all supporting documents and request a status update. Consider whether an NNAS expedited report via CGFNS/TruMerit could be substituted if the current provider remains delayed.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 3,
+            "title": "Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+            "status": "upcoming",
+            "detail": "Complete an accepted English-language proficiency test. CELBAN is nursing-specific and widely used. The result must be valid (within 24 months) at the date CNO makes its registration decision — not merely at the date of application. Recommended test date: 2026-11-01. A 2026-11-01 result expires 2028-11-01. Even with the ECA-driven delay pushing the registration decision to 2027-09-15, the language test result remains valid until 2028-11-01 — a buffer of approximately 14 months beyond the revised decision date. No action required on this step due to the ECA delay.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://cno.org/become-a-nurse/registration-requirements/proficiency-in-english-or-french/accepted-language-proficiency-tests"
+          },
+          {
+            "id": 4,
+            "title": "Evidence of Practice (within the past three years)",
+            "status": "upcoming",
+            "detail": "Demonstrate paid RN practice, or completion of nursing education, within the three years immediately preceding the registration decision. For practice outside Ontario, Aida's employer must send a Verification of Nursing Practice form and her Philippine Nursing Board regulator must send a Verification of Registration form directly to CNO. With the revised registration decision date of 2027-09-15, the three-year lookback window runs from 2024-09-15 — unchanged in impact from the original plan. Documents should cover practice up to at least 2024-09-15. Gather these records now while employment contacts are accessible.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/evidence-of-practice"
+          },
+          {
+            "id": 5,
+            "title": "Transition to Practice (TTP) Requirement",
+            "status": "upcoming",
+            "detail": "All internationally educated RN applicants must meet the CNO Transition to Practice requirement. As Aida is newly arrived from the Philippines, she will most likely need to complete a CNO-approved TTP course (valid five years from completion). With the revised timeline, TTP completion target shifts to 2027-05-01 (was 2027-03-01). A 2027-05-01 completion date gives a valid TTP until 2032-05-01, well within the revised registration decision window of 2027-09-15. Enrol in a TTP cohort as early as possible — popular cohorts fill quickly and availability may be limited.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/transition-to-practice"
+          },
+          {
+            "id": 6,
+            "title": "CNO Registration Application",
+            "status": "not-started",
+            "detail": "Once CNO has received the ECA report (now expected 2027-05-01, delayed from 2027-02-01), Aida submits the registration application directly to CNO. The application triggers CNO's review of all requirements: language proficiency, evidence of practice, TTP, authorization to work, and the criminal record check. Revised target application submission: 2027-05-15 (was 2027-02-15, a slip of +3 months).",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          },
+          {
+            "id": 7,
+            "title": "Jurisprudence Examination (RN)",
+            "status": "not-started",
+            "detail": "Open-book, online exam covering Ontario nursing laws, CNO by-laws, regulations, practice standards, and guidelines. Can be written any time after CNO confirms applicant status — including during the application review period. Must be paid for and completed within 30 days of fee payment; can be retaken as needed. No expiry on the result. Revised target completion: 2027-06-15 (was 2027-03-15, a slip of +3 months).",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/jurisprudence-examination"
+          },
+          {
+            "id": 8,
+            "title": "Police Criminal Record Check (Sterling Backcheck)",
+            "status": "at-risk",
+            "detail": "⚠️ EXPIRY COLLISION. This check was planned for order on 2027-03-01, which would issue a result by approximately 2027-03-15 — valid for 6 months until 2027-09-01. However, the ECA delay has pushed the revised CNO registration decision to 2027-09-15. The check issued on 2027-03-15 expires 2027-09-01 — 14 days BEFORE the revised decision date of 2027-09-15. If the check is not refreshed, CNO will require a new one, adding further delay and cost. ACTION REQUIRED: Do NOT order the check on 2027-03-01 as originally planned. Instead, delay ordering until 2027-04-01 (targeting a result by 2027-04-15, valid until 2027-10-15), which safely covers the revised 2027-09-15 decision date with a one-month buffer. Sterling Backcheck is the only provider CNO accepts.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/past-offences-and-findings--health-and-conduct/police-criminal-record-check"
+          },
+          {
+            "id": 9,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "National licensure examination administered by NCSBN. Aida must first receive eligibility confirmation from CNO before registering with NCSBN to sit the exam. With the revised application submission of 2027-05-15, CNO eligibility is now expected approximately 2027-07-15 (was 2027-04-01, a slip of +3 months). Schedule and write the NCLEX-RN promptly after eligibility is confirmed. Revised target exam date: 2027-08-15 (was 2027-05-01). Passing the NCLEX-RN remains the final clinical competency gate before CNO issues the certificate of registration.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 10,
+            "title": "CNO Certificate of Registration Issued",
+            "status": "not-started",
+            "detail": "Upon successful completion of all requirements — ECA, language proficiency, evidence of practice, TTP, jurisprudence exam, criminal record check, NCLEX-RN, and valid authorization to work — CNO issues Aida's certificate of registration as a Registered Nurse in Ontario. Due to the ECA processing delay, the revised estimated issuance date is 2027-09-15 (was 2027-06-01, a slip of +3 months and 15 days). Aida may then practice as an RN in Ontario.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          }
+        ],
+        "logEntry": {
+          "text": "⚠️ DELAY ALERT — two steps marked at-risk as of 2026-09-14.\n\nCOLLISION IDENTIFIED: ECA processing delay (Step 2) → Police Criminal Record Check expiry before registration decision (Step 8).\n\nROOT CAUSE: The ECA submitted on 2026-10-01 has taken 7 months rather than the planned 4 months, meaning CNO will not receive the report until 2027-05-01 (3 months later than the 2027-02-01 target). This is within the documented worst-case range when providers request supplementary documents from Philippine institutions.\n\nCASCADE: The 3-month ECA slip pushes every downstream date by approximately the same amount:\n  • CNO application: 2027-05-15 (was 2027-02-15)\n  • Jurisprudence exam: 2027-06-15 (was 2027-03-15)\n  • NCLEX-RN eligibility: 2027-07-15 (was 2027-04-01)\n  • NCLEX-RN exam: 2027-08-15 (was 2027-05-01)\n  • Registration decision / certificate: 2027-09-15 (was 2027-06-01)\n\nACUTE EXPIRY COLLISION — Step 8 (Criminal Record Check): The check was planned to be ordered on 2027-03-01, producing a result valid for 6 months until 2027-09-01. The revised registration decision date of 2027-09-15 falls 14 days AFTER that expiry. If ordered as planned, CNO will reject the expired check and require a new one — adding further delay and a second Sterling Backcheck fee.\n\nCONCRETE RECOMMENDATION for Step 8: Delay the Sterling Backcheck order from 2027-03-01 to 2027-04-01. A check ordered 2027-04-01 will be returned by approximately 2027-04-15 and remains valid until 2027-10-15 — covering the revised decision date of 2027-09-15 with a full month of buffer.\n\nNO OTHER COLLISIONS: Language proficiency (CELBAN taken 2026-11-01, valid until 2028-11-01) is safe through the revised decision date. TTP validity (5 years from completion) and Evidence of Practice three-year lookback are unaffected by the shift.\n\nACTION THIS WEEK: Contact the ECA provider immediately to confirm all Philippine nursing transcripts and supporting documents have been received and are under review. If the provider cannot confirm imminent completion, explore whether an NNAS expedited report via CGFNS/TruMerit is accepted by CNO as a substitute (CNO's approved-ECA page confirms it still accepts these) — that pathway may recover some lost time.",
+          "flag": true
+        },
+        "regulator": "College of Nurses of Ontario (CNO)",
+        "regulatorUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+      },
+      "scores": {
+        "contract": {
+          "ok": true,
+          "problems": []
+        },
+        "grounding": {
+          "steps": 10,
+          "sourced": 10,
+          "off_jurisdiction": 0,
+          "off_ruleset": 0,
+          "off_kb": 0,
+          "null": 0,
+          "bad_urls": [],
+          "regulator_url": "sourced",
+          "ok": true,
+          "target_ruleset_url_count": 11
+        },
+        "semantics": {
+          "ok": true,
+          "checks": {
+            "had_prior_steps": true,
+            "flag_true": true,
+            "has_at_risk": true,
+            "log_has_iso_date": true
+          },
+          "problems": []
+        }
+      },
+      "no_upstream": false,
+      "passed": true
+    },
+    {
+      "id": "rn-on-rejection",
+      "event": "simulate_rejection",
+      "check": "rejection",
+      "request": {
+        "profile": {
+          "name": "Aida Torres",
+          "profession": "Registered Nurse",
+          "countryTrained": "Philippines",
+          "targetCountry": "Canada",
+          "targetRegion": "Ontario"
+        },
+        "event": "simulate_rejection",
+        "currentSteps": [
+          {
+            "id": 1,
+            "title": "Authorization to Work in Canada",
+            "status": "in-progress",
+            "detail": "Obtain and maintain valid proof of Canadian citizenship, permanent residency, or a work/study permit that authorizes nursing practice in Ontario. CNO requires this document to be unexpired when submitted. Without it, CNO holds the application open for up to two years, or registers Aida with a condition preventing practice. Confirm current immigration status before submitting the CNO application.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/authorization-to-work"
+          },
+          {
+            "id": 2,
+            "title": "Educational Credential Assessment (ECA)",
+            "status": "upcoming",
+            "detail": "Submit nursing transcripts and educational documents to a CNO-approved ECA provider — WES, ICAS, or ICES (BCIT). CNO must receive the ECA report directly from the provider before Aida can submit a registration application. Allow approximately 3–5 months for processing. Target submission: 2026-10-01; expected CNO receipt: 2027-02-01. CNO also accepts NNAS expedited reports prepared by CGFNS/TruMerit. No expiry period applies to the ECA report itself.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 3,
+            "title": "Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+            "status": "upcoming",
+            "detail": "Complete an accepted English-language proficiency test. CELBAN is nursing-specific and widely used. The result must be valid (within 24 months) at the date CNO makes its registration decision — not merely at the date of application. Recommended test date: 2026-11-01. A 2026-11-01 result expires 2028-11-01, providing a comfortable buffer through the anticipated registration decision in mid-2027. Do NOT test too early: a result taken before 2025-09-14 would already be expired today.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://cno.org/become-a-nurse/registration-requirements/proficiency-in-english-or-french/accepted-language-proficiency-tests"
+          },
+          {
+            "id": 4,
+            "title": "Evidence of Practice (within the past three years)",
+            "status": "upcoming",
+            "detail": "Demonstrate paid RN practice, or completion of nursing education, within the three years immediately preceding the registration decision. For practice outside Ontario, Aida's employer must send a Verification of Nursing Practice form and her Philippine Nursing Board regulator must send a Verification of Registration form directly to CNO. Ensure these cover practice up to at least 2024-09-14 (three years before the expected 2027 decision window). Gather documents now while employment records are accessible.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/evidence-of-practice"
+          },
+          {
+            "id": 5,
+            "title": "Transition to Practice (TTP) Requirement",
+            "status": "upcoming",
+            "detail": "All internationally educated RN applicants must meet the CNO Transition to Practice requirement. Options: (a) a Canadian nursing degree/diploma, (b) nursing practice in Canada within the past three years, or (c) a CNO-approved TTP course (valid five years from completion) or a school Education Pathway program (valid three years). As Aida is newly arrived from the Philippines, she will most likely need to complete a CNO-approved TTP course. Research approved TTP providers early — popular cohorts fill quickly. Target TTP completion: 2027-03-01. A 2027-03-01 completion date gives a valid TTP until 2032-03-01, well within the registration decision window.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/transition-to-practice"
+          },
+          {
+            "id": 6,
+            "title": "CNO Registration Application",
+            "status": "not-started",
+            "detail": "Once CNO has received the ECA report (expected 2027-02-01), Aida submits the registration application herself directly to CNO. The application triggers CNO's review of all requirements: language proficiency, evidence of practice, TTP, authorization to work, and the criminal record check. Target application submission: 2027-02-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          },
+          {
+            "id": 7,
+            "title": "Jurisprudence Examination (RN)",
+            "status": "not-started",
+            "detail": "Open-book, online exam covering Ontario nursing laws, CNO by-laws, regulations, practice standards, and guidelines. Can be written any time after CNO confirms applicant status — including during the application review period. Must be paid for and completed within 30 days of fee payment; can be retaken as needed. No expiry on the result. Target completion: 2027-03-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/jurisprudence-examination"
+          },
+          {
+            "id": 8,
+            "title": "Police Criminal Record Check (Sterling Backcheck)",
+            "status": "not-started",
+            "detail": "Obtain a police criminal record check exclusively through Sterling Backcheck (the only provider CNO accepts). This check is valid for six months from issue. Do NOT order it too early — if it expires before CNO's registration decision it must be redone. Recommended order date: 2027-03-01 (targeting a result by 2027-03-15, valid until 2027-09-15, which covers the anticipated registration decision). CNO recommends getting it near the end of the process, after the application is submitted.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/past-offences-and-findings--health-and-conduct/police-criminal-record-check"
+          },
+          {
+            "id": 9,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "National licensure examination administered by NCSBN. Aida must first receive eligibility confirmation from CNO before registering with NCSBN to sit the exam. After CNO declares eligibility (expected 2027-04-01), schedule and write the NCLEX-RN. Target exam date: 2027-05-01. Passing the NCLEX-RN is the final clinical competency gate before CNO issues the certificate of registration.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 10,
+            "title": "CNO Certificate of Registration Issued",
+            "status": "not-started",
+            "detail": "Upon successful completion of all requirements — ECA, language proficiency, evidence of practice, TTP, jurisprudence exam, criminal record check, NCLEX-RN, and valid authorization to work — CNO issues Aida's certificate of registration as a Registered Nurse in Ontario. Estimated issuance: 2027-06-01. Aida may then practice as an RN in Ontario.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          }
+        ]
+      },
+      "http_status": 200,
+      "elapsed_ms": 59326,
+      "response": {
+        "steps": [
+          {
+            "id": 1,
+            "title": "Authorization to Work in Canada",
+            "status": "in-progress",
+            "detail": "Obtain and maintain valid proof of Canadian citizenship, permanent residency, or a work/study permit that authorizes nursing practice in Ontario. CNO requires this document to be unexpired when submitted. Without it, CNO holds the application open for up to two years, or registers Aida with a condition preventing practice. Confirm current immigration status before submitting the CNO application.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/authorization-to-work"
+          },
+          {
+            "id": 2,
+            "title": "Educational Credential Assessment (ECA)",
+            "status": "at-risk",
+            "detail": "REJECTED — ECA provider (WES/ICAS/ICES-BCIT) returned the file on 2026-09-14 citing missing or incomplete source documents from Aida's Philippine nursing school: official sealed transcripts and/or proof of degree conferral were not received directly from the institution. The ECA cannot be issued until these documents are re-requested and received. Original CNO receipt target of 2027-02-01 is now void. See Step 3 for the remediation path.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 3,
+            "title": "ECA Document Remediation — Re-request Philippine Source Documents",
+            "status": "not-started",
+            "detail": "Immediately contact the Philippine Nursing School's Registrar and the Professional Regulation Commission (PRC) of the Philippines to request fresh, officially sealed transcripts and proof of degree conferral sent directly to the ECA provider. Allow 6–10 weeks for the Philippine institution to process and dispatch documents internationally. Target document dispatch from Philippines: 2026-11-01. Once the ECA provider confirms receipt of compliant source documents, resubmit the full ECA application. Allow a further 3–5 months for reassessment. Revised target for CNO receipt of ECA report: 2027-07-01 — approximately 5 months later than the original 2027-02-01 target. Note: this delay also pushes the anticipated CNO registration decision to approximately 2027-09-01, which places the criminal record check (Step 9) on a tight validity window — see Step 9 detail.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 4,
+            "title": "Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+            "status": "upcoming",
+            "detail": "Complete an accepted English-language proficiency test. CELBAN is nursing-specific and widely used. The result must be valid (within 24 months) at the date CNO makes its registration decision — not merely at the date of application. Recommended test date: 2026-11-01. A result taken 2026-11-01 expires 2028-11-01, which is 16 months beyond the revised registration decision target of 2027-09-01 — still a safe buffer even after the ECA delay. No change to timing is required for this step.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://cno.org/become-a-nurse/registration-requirements/proficiency-in-english-or-french/accepted-language-proficiency-tests"
+          },
+          {
+            "id": 5,
+            "title": "Evidence of Practice (within the past three years)",
+            "status": "upcoming",
+            "detail": "Demonstrate paid RN practice, or completion of nursing education, within the three years immediately preceding the registration decision. For practice outside Ontario, Aida's employer must send a Verification of Nursing Practice form and her Philippine Nursing Board regulator must send a Verification of Registration form directly to CNO. With the revised registration decision window of approximately 2027-09-01, practice evidence must cover activity no earlier than 2024-09-01. Begin gathering Verification of Nursing Practice and Verification of Registration forms now — while Philippine employment records and PRC contacts are active — as this step is not blocked by the ECA remediation.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/evidence-of-practice"
+          },
+          {
+            "id": 6,
+            "title": "Transition to Practice (TTP) Requirement",
+            "status": "upcoming",
+            "detail": "All internationally educated RN applicants must meet the CNO Transition to Practice requirement. As Aida is newly arrived from the Philippines she will most likely need to complete a CNO-approved TTP course (valid five years from completion). Research and register for an approved TTP provider immediately — popular cohorts fill quickly and the ECA delay means competition for later-2027 cohorts will be high. Revised target TTP completion: 2027-08-01. A completion date of 2027-08-01 gives a validity window until 2032-08-01, comfortably covering the revised registration decision of approximately 2027-09-01.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/transition-to-practice"
+          },
+          {
+            "id": 7,
+            "title": "CNO Registration Application",
+            "status": "not-started",
+            "detail": "BLOCKED pending ECA remediation (Step 3). Once CNO has received the revised ECA report (now expected 2027-07-01), Aida submits the registration application directly to CNO. The application triggers CNO's review of all requirements: language proficiency, evidence of practice, TTP, authorization to work, and the criminal record check. Revised target application submission: 2027-07-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          },
+          {
+            "id": 8,
+            "title": "Jurisprudence Examination (RN)",
+            "status": "not-started",
+            "detail": "BLOCKED pending CNO Registration Application (Step 7). Open-book, online exam covering Ontario nursing laws, CNO by-laws, regulations, practice standards, and guidelines. Can be written any time after CNO confirms applicant status — including during the application review period. Must be paid for and completed within 30 days of fee payment; can be retaken as needed. No expiry on the result. Revised target completion: 2027-08-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/jurisprudence-examination"
+          },
+          {
+            "id": 9,
+            "title": "Police Criminal Record Check (Sterling Backcheck)",
+            "status": "not-started",
+            "detail": "BLOCKED pending CNO Registration Application (Step 7). Obtain a police criminal record check exclusively through Sterling Backcheck (the only provider CNO accepts). This check is valid for six months from issue. TIMING RISK: with the revised registration decision now targeting approximately 2027-09-01, a check ordered on 2027-03-01 (valid until 2027-09-01) would expire precisely at the decision date. Do NOT order before 2027-04-01. Recommended order date: 2027-04-01, targeting a result by 2027-04-15 and validity through 2027-10-15 — providing a 6-week buffer past the revised decision date. CNO recommends getting the check near the end of the process, after the application is submitted.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/past-offences-and-findings--health-and-conduct/police-criminal-record-check"
+          },
+          {
+            "id": 10,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "BLOCKED pending CNO eligibility confirmation. National licensure examination administered by NCSBN. Aida must first receive eligibility confirmation from CNO before registering with NCSBN to sit the exam. After CNO declares eligibility (revised expectation: 2027-08-01), schedule and write the NCLEX-RN. Revised target exam date: 2027-09-01. Passing the NCLEX-RN is the final clinical competency gate before CNO issues the certificate of registration.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 11,
+            "title": "CNO Certificate of Registration Issued",
+            "status": "not-started",
+            "detail": "BLOCKED — depends on successful completion of all requirements: ECA, language proficiency, evidence of practice, TTP, jurisprudence exam, criminal record check, NCLEX-RN, and valid authorization to work. Due to the ECA rejection and remediation delay, the estimated certificate issuance date has shifted from 2027-06-01 to approximately 2027-10-01 — a delay of approximately 4 months. Aida may then practice as an RN in Ontario.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          }
+        ],
+        "logEntry": {
+          "text": "REJECTION ALERT — ECA returned incomplete (2026-09-14): Aida's Educational Credential Assessment (Step 2) has been rejected by the ECA provider because official sealed transcripts and/or proof of degree conferral from her Philippine nursing school were not received directly from the institution. This is the root dependency for the entire pathway: CNO cannot accept a registration application until it receives a valid ECA report, so Steps 7–11 are all blocked.\n\nA new remediation step (Step 3) has been inserted: Aida must immediately contact her Philippine nursing school's Registrar and the PRC to dispatch compliant, institution-sealed documents directly to the ECA provider. Target document dispatch: 2026-11-01. Allowing 3–5 months for reassessment, the revised CNO ECA receipt date is now 2027-07-01 (originally 2027-02-01).\n\nCascade of revised dates:\n• CNO Registration Application: 2027-07-15 (was 2027-02-15)\n• Jurisprudence Exam: 2027-08-15 (was 2027-03-15)\n• Criminal Record Check: order no earlier than 2027-04-01, valid through 2027-10-15 — the previously planned 2027-03-01 order date would produce a check expiring 2027-09-01, which coincides exactly with the new decision date and must be avoided\n• NCLEX-RN: 2027-09-01 (was 2027-05-01)\n• Certificate of Registration: approximately 2027-10-01 (was 2027-06-01) — a 4-month overall delay\n\nSteps not affected by the ECA rejection and still actionable now: Step 1 (Authorization to Work — continue in-progress), Step 4 (Language test 2026-11-01 — proceed as planned; result expires 2028-11-01, still 16 months clear of the revised decision date), Step 5 (Evidence of Practice verification forms — begin gathering immediately while Philippine contacts are active), Step 6 (TTP research and enrolment — register for a cohort targeting completion by 2027-08-01).\n\nImmediate action required: contact the Philippine school Registrar and PRC today (2026-09-14) to initiate re-dispatch of source documents.",
+          "flag": true
+        },
+        "regulator": "College of Nurses of Ontario (CNO)",
+        "regulatorUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+      },
+      "scores": {
+        "contract": {
+          "ok": true,
+          "problems": []
+        },
+        "grounding": {
+          "steps": 11,
+          "sourced": 11,
+          "off_jurisdiction": 0,
+          "off_ruleset": 0,
+          "off_kb": 0,
+          "null": 0,
+          "bad_urls": [],
+          "regulator_url": "sourced",
+          "ok": true,
+          "target_ruleset_url_count": 11
+        },
+        "semantics": {
+          "ok": true,
+          "checks": {
+            "flag_true": true,
+            "had_prior_steps": true,
+            "remediation_step": true
+          },
+          "problems": []
+        }
+      },
+      "no_upstream": false,
+      "passed": true
+    },
+    {
+      "id": "rn-on-reset",
+      "event": "reset",
+      "check": "reset",
+      "request": {
+        "profile": {
+          "name": "Aida Torres",
+          "profession": "Registered Nurse",
+          "countryTrained": "Philippines",
+          "targetCountry": "Canada",
+          "targetRegion": "Ontario"
+        },
+        "event": "reset",
+        "currentSteps": [
+          {
+            "id": 1,
+            "title": "Authorization to Work in Canada",
+            "status": "in-progress",
+            "detail": "Obtain and maintain valid proof of Canadian citizenship, permanent residency, or a work/study permit that authorizes nursing practice in Ontario. CNO requires this document to be unexpired when submitted. Without it, CNO holds the application open for up to two years, or registers Aida with a condition preventing practice. Confirm current immigration status before submitting the CNO application.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/authorization-to-work"
+          },
+          {
+            "id": 2,
+            "title": "Educational Credential Assessment (ECA)",
+            "status": "at-risk",
+            "detail": "REJECTED — ECA provider (WES/ICAS/ICES-BCIT) returned the file on 2026-09-14 citing missing or incomplete source documents from Aida's Philippine nursing school: official sealed transcripts and/or proof of degree conferral were not received directly from the institution. The ECA cannot be issued until these documents are re-requested and received. Original CNO receipt target of 2027-02-01 is now void. See Step 3 for the remediation path.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 3,
+            "title": "ECA Document Remediation — Re-request Philippine Source Documents",
+            "status": "not-started",
+            "detail": "Immediately contact the Philippine Nursing School's Registrar and the Professional Regulation Commission (PRC) of the Philippines to request fresh, officially sealed transcripts and proof of degree conferral sent directly to the ECA provider. Allow 6–10 weeks for the Philippine institution to process and dispatch documents internationally. Target document dispatch from Philippines: 2026-11-01. Once the ECA provider confirms receipt of compliant source documents, resubmit the full ECA application. Allow a further 3–5 months for reassessment. Revised target for CNO receipt of ECA report: 2027-07-01 — approximately 5 months later than the original 2027-02-01 target. Note: this delay also pushes the anticipated CNO registration decision to approximately 2027-09-01, which places the criminal record check (Step 9) on a tight validity window — see Step 9 detail.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 4,
+            "title": "Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+            "status": "upcoming",
+            "detail": "Complete an accepted English-language proficiency test. CELBAN is nursing-specific and widely used. The result must be valid (within 24 months) at the date CNO makes its registration decision — not merely at the date of application. Recommended test date: 2026-11-01. A result taken 2026-11-01 expires 2028-11-01, which is 16 months beyond the revised registration decision target of 2027-09-01 — still a safe buffer even after the ECA delay. No change to timing is required for this step.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://cno.org/become-a-nurse/registration-requirements/proficiency-in-english-or-french/accepted-language-proficiency-tests"
+          },
+          {
+            "id": 5,
+            "title": "Evidence of Practice (within the past three years)",
+            "status": "upcoming",
+            "detail": "Demonstrate paid RN practice, or completion of nursing education, within the three years immediately preceding the registration decision. For practice outside Ontario, Aida's employer must send a Verification of Nursing Practice form and her Philippine Nursing Board regulator must send a Verification of Registration form directly to CNO. With the revised registration decision window of approximately 2027-09-01, practice evidence must cover activity no earlier than 2024-09-01. Begin gathering Verification of Nursing Practice and Verification of Registration forms now — while Philippine employment records and PRC contacts are active — as this step is not blocked by the ECA remediation.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/evidence-of-practice"
+          },
+          {
+            "id": 6,
+            "title": "Transition to Practice (TTP) Requirement",
+            "status": "upcoming",
+            "detail": "All internationally educated RN applicants must meet the CNO Transition to Practice requirement. As Aida is newly arrived from the Philippines she will most likely need to complete a CNO-approved TTP course (valid five years from completion). Research and register for an approved TTP provider immediately — popular cohorts fill quickly and the ECA delay means competition for later-2027 cohorts will be high. Revised target TTP completion: 2027-08-01. A completion date of 2027-08-01 gives a validity window until 2032-08-01, comfortably covering the revised registration decision of approximately 2027-09-01.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/transition-to-practice"
+          },
+          {
+            "id": 7,
+            "title": "CNO Registration Application",
+            "status": "not-started",
+            "detail": "BLOCKED pending ECA remediation (Step 3). Once CNO has received the revised ECA report (now expected 2027-07-01), Aida submits the registration application directly to CNO. The application triggers CNO's review of all requirements: language proficiency, evidence of practice, TTP, authorization to work, and the criminal record check. Revised target application submission: 2027-07-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          },
+          {
+            "id": 8,
+            "title": "Jurisprudence Examination (RN)",
+            "status": "not-started",
+            "detail": "BLOCKED pending CNO Registration Application (Step 7). Open-book, online exam covering Ontario nursing laws, CNO by-laws, regulations, practice standards, and guidelines. Can be written any time after CNO confirms applicant status — including during the application review period. Must be paid for and completed within 30 days of fee payment; can be retaken as needed. No expiry on the result. Revised target completion: 2027-08-15.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/jurisprudence-examination"
+          },
+          {
+            "id": 9,
+            "title": "Police Criminal Record Check (Sterling Backcheck)",
+            "status": "not-started",
+            "detail": "BLOCKED pending CNO Registration Application (Step 7). Obtain a police criminal record check exclusively through Sterling Backcheck (the only provider CNO accepts). This check is valid for six months from issue. TIMING RISK: with the revised registration decision now targeting approximately 2027-09-01, a check ordered on 2027-03-01 (valid until 2027-09-01) would expire precisely at the decision date. Do NOT order before 2027-04-01. Recommended order date: 2027-04-01, targeting a result by 2027-04-15 and validity through 2027-10-15 — providing a 6-week buffer past the revised decision date. CNO recommends getting the check near the end of the process, after the application is submitted.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/past-offences-and-findings--health-and-conduct/police-criminal-record-check"
+          },
+          {
+            "id": 10,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "BLOCKED pending CNO eligibility confirmation. National licensure examination administered by NCSBN. Aida must first receive eligibility confirmation from CNO before registering with NCSBN to sit the exam. After CNO declares eligibility (revised expectation: 2027-08-01), schedule and write the NCLEX-RN. Revised target exam date: 2027-09-01. Passing the NCLEX-RN is the final clinical competency gate before CNO issues the certificate of registration.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 11,
+            "title": "CNO Certificate of Registration Issued",
+            "status": "not-started",
+            "detail": "BLOCKED — depends on successful completion of all requirements: ECA, language proficiency, evidence of practice, TTP, jurisprudence exam, criminal record check, NCLEX-RN, and valid authorization to work. Due to the ECA rejection and remediation delay, the estimated certificate issuance date has shifted from 2027-06-01 to approximately 2027-10-01 — a delay of approximately 4 months. Aida may then practice as an RN in Ontario.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          }
+        ]
+      },
+      "http_status": 200,
+      "elapsed_ms": 46273,
+      "response": {
+        "steps": [
+          {
+            "id": 1,
+            "title": "Authorization to Work in Canada",
+            "status": "in-progress",
+            "detail": "Obtain and maintain valid proof of Canadian citizenship, permanent residency, or a work/study permit that authorizes nursing practice in Ontario. CNO requires this document to be unexpired when submitted. Without it, CNO holds the application open for up to two years, or registers Aida with a condition preventing practice. Confirm current immigration status before submitting the CNO application.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/authorization-to-work"
+          },
+          {
+            "id": 2,
+            "title": "Educational Credential Assessment (ECA)",
+            "status": "in-progress",
+            "detail": "Use a CNO-approved ECA provider — WES, ICAS, or ICES-BCIT — to have Philippine nursing credentials assessed. CNO must receive the ECA report and supporting educational documents before Aida submits her registration application. Contact the Philippine Nursing School Registrar and the Professional Regulation Commission (PRC) of the Philippines to obtain officially sealed transcripts and proof of degree conferral, sent directly to the chosen ECA provider. Allow 6–10 weeks for Philippine institutions to dispatch documents, then 3–5 months for the ECA assessment. Target ECA report received by CNO: 2027-02-01 (approximately 17 months from today 2026-09-14). This is the critical-path gate for Step 7.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers"
+          },
+          {
+            "id": 3,
+            "title": "Language Proficiency Test (IELTS Academic / CELBAN / OET)",
+            "status": "upcoming",
+            "detail": "Complete one of CNO's accepted English-language proficiency tests. CELBAN is nursing-specific and widely used. The result must be valid (within 24 months) at the date CNO makes its registration decision — not merely at the date of application. Recommended test date: 2026-11-01. A result taken on 2026-11-01 expires on 2028-11-01 (exactly 24 months later), which is 14 months beyond the target registration decision of approximately 2027-09-01 — a comfortable buffer. Begin preparing for this test now; it can be completed in parallel with the ECA.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://cno.org/become-a-nurse/registration-requirements/proficiency-in-english-or-french/accepted-language-proficiency-tests"
+          },
+          {
+            "id": 4,
+            "title": "Evidence of Practice (within the past three years)",
+            "status": "upcoming",
+            "detail": "Demonstrate paid RN practice, or completion of nursing education, within the three years immediately preceding CNO's registration decision. For practice outside Ontario, Aida's employer must send a Verification of Nursing Practice form and her Philippine nursing regulator (PRC) must send a Verification of Registration form directly to CNO. With a target registration decision of approximately 2027-09-01, practice evidence must cover activity no earlier than 2024-09-01 (exactly 36 months prior). Begin gathering these forms now while Philippine employment records and PRC contacts are active — this step is not blocked by the ECA and can run in parallel.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/evidence-of-practice"
+          },
+          {
+            "id": 5,
+            "title": "Transition to Practice (TTP) Requirement",
+            "status": "upcoming",
+            "detail": "All internationally educated RN applicants must satisfy the CNO Transition to Practice requirement. As Aida is newly arrived from the Philippines, she will most likely need to complete a CNO-approved TTP course (valid for 60 months / 5 years from completion). Research and register for an approved TTP provider promptly — popular cohorts fill quickly. Target TTP completion: 2027-08-01. A completion date of 2027-08-01 gives a validity window extending to 2032-08-01, comfortably covering the target registration decision of approximately 2027-09-01.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/transition-to-practice"
+          },
+          {
+            "id": 6,
+            "title": "CNO Registration Application",
+            "status": "not-started",
+            "detail": "Once CNO has received the ECA report (target: 2027-02-01), submit the registration application directly to CNO. The application triggers CNO's review of all requirements: ECA, language proficiency, evidence of practice, TTP, authorization to work, and the criminal record check. Target application submission: 2027-02-15. All parallel-track items (Steps 3–5) should be in hand or actively underway before this date.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          },
+          {
+            "id": 7,
+            "title": "Jurisprudence Examination (RN)",
+            "status": "not-started",
+            "detail": "Open-book, online exam covering Ontario nursing laws, CNO by-laws, regulations, practice standards, and guidelines. Can be written any time after CNO confirms applicant status — including during the application review period. Must be paid for and completed within 30 days of fee payment; can be retaken as needed. No expiry on the result. Depends on Step 6 (CNO Registration Application). Target completion: 2027-04-01.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/jurisprudence-examination"
+          },
+          {
+            "id": 8,
+            "title": "Police Criminal Record Check (Sterling Backcheck)",
+            "status": "not-started",
+            "detail": "Obtain a police criminal record check exclusively through Sterling Backcheck — the only provider CNO accepts. This check is valid for 6 months from issue. CNO recommends ordering it near the end of the process, after the application is submitted (Step 6). With the target registration decision at approximately 2027-09-01, order no earlier than 2027-04-01. Recommended order date: 2027-04-01, targeting a result by 2027-04-15, valid through 2027-10-15 — providing a 6-week buffer past the target decision date of 2027-09-01. Do not order earlier or the check will expire before registration is granted.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-requirements/past-offences-and-findings--health-and-conduct/police-criminal-record-check"
+          },
+          {
+            "id": 9,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "National licensure examination administered by NCSBN. Aida must first receive eligibility confirmation from CNO (dependent on Step 6) before registering with NCSBN to sit the exam. After CNO declares eligibility (estimated: 2027-08-01), schedule and write the NCLEX-RN. Target exam date: 2027-09-01. Passing the NCLEX-RN is the final clinical competency gate before CNO issues the certificate of registration.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 10,
+            "title": "CNO Certificate of Registration Issued",
+            "status": "not-started",
+            "detail": "Issued once all requirements are satisfied: ECA received, language proficiency valid at decision date, evidence of practice confirmed, TTP valid at decision date, jurisprudence exam passed, criminal record check valid at decision date, NCLEX-RN passed, and authorization to work unexpired. Estimated certificate issuance: 2027-10-01. Aida may then legally practise as a Registered Nurse in Ontario.",
+            "source": "College of Nurses of Ontario (CNO)",
+            "sourceUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+          }
+        ],
+        "logEntry": {
+          "text": "RESET — pathway restored to clean build_pathway state as of 2026-09-14. All simulation overlays (ECA rejection, remediation step, at-risk flags) have been cleared. This is the baseline Ontario RN registration pathway for Aida Torres, internationally educated in the Philippines.\n\nPATHWAY OVERVIEW (10 steps, estimated 12–13 months to certificate):\n\nStep 1 — Authorization to Work: already in-progress; must remain valid throughout the process.\n\nStep 2 — ECA (in-progress): critical-path gate. Aida should be actively pursuing this with WES, ICAS, or ICES-BCIT. Philippine sealed transcripts and PRC degree conferral documents must be sent directly from the institution to the ECA provider. Allow ~6–10 weeks for Philippine dispatch and ~3–5 months for assessment. Target CNO receipt: 2027-02-01.\n\nSteps 3–5 run IN PARALLEL with the ECA and should begin immediately:\n  • Step 3 — Language test (CELBAN/IELTS/OET): sit by 2026-11-01; result expires 2028-11-01 (24 months), clearing the target registration decision of 2027-09-01 by 14 months.\n  • Step 4 — Evidence of Practice: gather Verification of Nursing Practice and Verification of Registration (PRC) forms now; practice must cover activity from 2024-09-01 onward.\n  • Step 5 — TTP course: register early; popular cohorts fill fast. Target completion 2027-08-01 (validity window to 2032-08-01).\n\nStep 6 — CNO Registration Application: submit ~2027-02-15 once ECA is received.\n\nSteps 7–9 follow application confirmation:\n  • Step 7 — Jurisprudence Exam: target 2027-04-01.\n  • Step 8 — Criminal Record Check (Sterling Backcheck only, 6-month validity): order no earlier than 2027-04-01; target issue by 2027-04-15, valid through 2027-10-15, providing a 6-week buffer past the 2027-09-01 decision target.\n  • Step 9 — NCLEX-RN: target 2027-09-01 after CNO eligibility confirmation.\n\nStep 10 — Certificate of Registration: estimated 2027-10-01.\n\nKey validity dependencies confirmed:\n  • Language result (2026-11-01) → expires 2028-11-01: valid at decision ✓\n  • TTP (2027-08-01) → expires 2032-08-01 (60 months): valid at decision ✓\n  • Criminal record check (issued 2027-04-15) → expires 2027-10-15: valid at decision ✓\n  • Evidence of practice window: 2024-09-01 to 2027-09-01 = 36 months exactly ✓",
+          "flag": false
+        },
+        "regulator": "College of Nurses of Ontario (CNO)",
+        "regulatorUrl": "https://www.cno.org/become-a-nurse/registration-guides/outside-canada"
+      },
+      "scores": {
+        "contract": {
+          "ok": true,
+          "problems": []
+        },
+        "grounding": {
+          "steps": 10,
+          "sourced": 10,
+          "off_jurisdiction": 0,
+          "off_ruleset": 0,
+          "off_kb": 0,
+          "null": 0,
+          "bad_urls": [],
+          "regulator_url": "sourced",
+          "ok": true,
+          "target_ruleset_url_count": 11
+        },
+        "semantics": {
+          "ok": true,
+          "checks": {
+            "flag_false": true
+          },
+          "problems": []
+        }
+      },
+      "no_upstream": false,
+      "passed": true
+    },
+    {
+      "id": "swe-on-build",
+      "event": "build_pathway",
+      "check": "unregulated",
+      "request": {
+        "profile": {
+          "name": "Wei Chen",
+          "profession": "Software Engineer",
+          "countryTrained": "China",
+          "targetCountry": "Canada",
+          "targetRegion": "Ontario"
+        },
+        "event": "build_pathway",
+        "currentSteps": []
+      },
+      "http_status": 200,
+      "elapsed_ms": 16391,
+      "response": {
+        "steps": [
+          {
+            "id": 1,
+            "title": "Educational Credential Assessment (ECA) for Immigration",
+            "status": "in-progress",
+            "detail": "Submit your Chinese post-secondary degree(s) to a designated ECA organization (e.g. WES, ICAS, or IQAS) for evaluation. The ECA report is required for Express Entry / Permanent Residence applications and confirms Canadian equivalency. Processing typically takes 7–10 weeks from submission; target completion by approx. 2026-12-14. Note: this is an immigration document, NOT a licence to practise.",
+            "source": "Immigration, Refugees and Citizenship Canada (IRCC) – ECA Program",
+            "sourceUrl": null
+          },
+          {
+            "id": 2,
+            "title": "Portfolio & Reference Verification for Employer Onboarding",
+            "status": "not-started",
+            "detail": "Compile a professional portfolio (GitHub repositories, project descriptions, past employer references from China) translated into English where necessary. Canadian employers in Ontario commonly request this during hiring. No regulatory body reviews this — it is entirely employer-driven. Begin once the ECA report is in hand (target: from 2026-12-14 onward).",
+            "source": "No regulator — employer-driven process",
+            "sourceUrl": null
+          },
+          {
+            "id": 3,
+            "title": "Optional: Explore P.Eng. Designation via PEO (Separate, Voluntary Path)",
+            "status": "not-started",
+            "detail": "If Wei Chen wishes to use the restricted title 'Professional Engineer (P.Eng.)' in the future, that requires a separate application to Professional Engineers Ontario (PEO), including an academic review, Canadian experience requirements, and the Professional Practice Examination (PPE). This is entirely voluntary and unrelated to working as a software engineer. It is noted here for awareness only.",
+            "source": "Professional Engineers Ontario (PEO)",
+            "sourceUrl": null
+          }
+        ],
+        "logEntry": {
+          "text": "Software Engineering is NOT a licensed or regulated profession in Ontario, Canada. Wei Chen does not need a practice licence to work as a software engineer — this is a deliberate finding, not an oversight. No regulatory body governs the title 'Software Engineer' in Ontario (only the reserved title 'Professional Engineer / P.Eng.' is restricted, governed by PEO, and is a separate voluntary pursuit). The steps below cover work-authorization only: an Educational Credential Assessment (ECA) for immigration purposes (e.g. Express Entry / PR) and portfolio or reference verification for employer onboarding. Estimated timeframe from 2026-09-14: ECA approximately 2–3 months (by approx. 2026-12-14), then employment search and employer verification on hire. No licensing exam, no registration, no regulated bridge program required.",
+          "flag": false
+        },
+        "regulator": null,
+        "regulatorUrl": null
+      },
+      "scores": {
+        "contract": {
+          "ok": true,
+          "problems": []
+        },
+        "grounding": {
+          "steps": 3,
+          "sourced": 0,
+          "off_jurisdiction": 0,
+          "off_ruleset": 0,
+          "off_kb": 0,
+          "null": 3,
+          "bad_urls": [],
+          "regulator_url": "null",
+          "ok": true,
+          "target_ruleset_url_count": 0
+        },
+        "semantics": {
+          "ok": true,
+          "checks": {
+            "flag_false": true,
+            "2_to_4_steps": true,
+            "no_exam_or_licence_step": true,
+            "log_says_unregulated": true,
+            "no_regulator": true,
+            "no_regulator_url": true
+          },
+          "problems": []
+        }
+      },
+      "no_upstream": false,
+      "passed": true
+    },
+    {
+      "id": "rn-de-build",
+      "event": "build_pathway",
+      "check": "build",
+      "request": {
+        "profile": {
+          "name": "Lena Novak",
+          "profession": "Registered Nurse",
+          "countryTrained": "Croatia",
+          "targetCountry": "Germany",
+          "targetRegion": "Germany"
+        },
+        "event": "build_pathway",
+        "currentSteps": []
+      },
+      "http_status": 200,
+      "elapsed_ms": 35732,
+      "response": {
+        "steps": [
+          {
+            "id": 1,
+            "title": "Select the correct Anerkennungsbehörde (State Recognition Authority)",
+            "status": "in-progress",
+            "detail": "As a Croatian-trained nurse, identify the Bundesland where you intend to work and locate its specific Anerkennungsbehörde. Germany has 16 federal states, each with its own authority and slightly different procedures. Use the Recognition Finder at anerkennung-in-deutschland.de to confirm the right office. Do this before submitting any documents. Target completion: 2026-10-14.",
+            "source": "State recognition authority (Anerkennungsbehörde des Bundeslandes)",
+            "sourceUrl": "https://www.anerkennung-in-deutschland.de/en/interest/finder/profession"
+          },
+          {
+            "id": 2,
+            "title": "Antrag auf Anerkennung — Equivalency Assessment Application",
+            "status": "upcoming",
+            "detail": "Submit your formal application for credential equivalency under the Pflegeberufegesetz (PflBG) to your chosen state authority. You must provide certified copies AND certified German translations of: nursing diploma, full academic transcripts, CV, and proof of professional registration in Croatia. The authority will compare your training to the German standard. Expect a decision (Bescheid) within approximately 3–4 months. Estimated submission: 2026-10-14; estimated decision: 2027-01-14. Note: approximately 85% of non-EU applicants receive a Defizitbescheid (gaps found), triggering Step 5.",
+            "source": "State recognition authority (Anerkennungsbehörde des Bundeslandes)",
+            "sourceUrl": "https://www.anerkennung-in-deutschland.de/en/interest/finder/profession"
+          },
+          {
+            "id": 3,
+            "title": "Begin German Language Learning — Target B2 CEFR + Fachsprachprüfung",
+            "status": "upcoming",
+            "detail": "Enrol in a German language course immediately — this can run in parallel with Step 2 and should not be delayed. You need two things: (1) a general German B2 certificate (e.g. Goethe-Zertifikat B2 or telc Deutsch B2) and (2) the Fachsprachprüfung, a specialist medical/nursing language exam administered by your Bundesland's Medical or Nursing Chamber. Under the Recognition Partnership (in force since 2024-03-01) you may enter Germany and begin working at A2/B1 level, but full licence issuance requires B2. Both certificates must be valid at the point the authority makes its final registration decision. Estimated B2 certificate: 2027-03-14 (assuming starting from A2/B1 level); Fachsprachprüfung: 2027-06-14.",
+            "source": "State recognition authority (Anerkennungsbehörde des Bundeslandes)",
+            "sourceUrl": "https://www.anerkennung-in-deutschland.de/"
+          },
+          {
+            "id": 4,
+            "title": "Police Clearance (Führungszeugnis) + Health Suitability Certificate",
+            "status": "not-started",
+            "detail": "Obtain: (1) an extended police clearance certificate (erweitertes Führungszeugnis) — apply via the Einwohnermeldeamt or German Embassy in Croatia; (2) a medical certificate confirming health suitability to practise as required under Section 2 PflBG. Both documents must be current at the point of the final registration decision. Do not obtain these too early — request them approximately 2–3 months before your file is complete. Target request date: 2027-04-14; must be valid at final decision estimated 2027-07-14.",
+            "source": "State recognition authority (Anerkennungsbehörde des Bundeslandes)",
+            "sourceUrl": "https://www.anerkennung-in-deutschland.de/"
+          },
+          {
+            "id": 5,
+            "title": "Adaptation Course or Knowledge Test (Anpassungslehrgang / Kenntnisprüfung) — if Defizitbescheid issued",
+            "status": "not-started",
+            "detail": "This step is conditional on the outcome of Step 2. If the authority issues a Defizitbescheid (deficit notice — expected for most non-EU applicants including those from Croatia), you must either: (a) complete a supervised adaptation placement (Anpassungslehrgang) at an approved German healthcare facility, typically 6–12 months, OR (b) pass a comprehensive knowledge test (Kenntnisprüfung). You choose which route. If a Defizitbescheid is issued circa 2027-01-14, an adaptation course would run approximately 2027-02-14 to 2027-08-14. This step is a hard prerequisite for Step 6 and must be completed before the licence is granted.",
+            "source": "State recognition authority (Anerkennungsbehörde des Bundeslandes)",
+            "sourceUrl": "https://www.anerkennung-in-deutschland.de/"
+          },
+          {
+            "id": 6,
+            "title": "Erlaubnis zum Führen der Berufsbezeichnung — Professional Licence (Pflegefachperson)",
+            "status": "not-started",
+            "detail": "Once all prior steps are satisfied — equivalency confirmed (or deficits resolved via Step 5), B2 general language certificate, Fachsprachprüfung, police clearance, and health suitability — the state authority grants the Approbation or Berufserlaubnis as Pflegefachperson (licence to use the professional title and practise as a registered nurse in Germany). The authority targets a decision within 3–4 months of a complete file. Estimated complete-file submission: 2027-06-14; estimated licence grant: 2027-09-14 (approximately 12 months from today 2026-09-14, assuming a Defizitbescheid is issued and the adaptation route is taken).",
+            "source": "State recognition authority (Anerkennungsbehörde des Bundeslandes)",
+            "sourceUrl": "https://www.anerkennung-in-deutschland.de/en/interest/finder/profession"
+          }
+        ],
+        "logEntry": {
+          "text": "Pathway built for Lena Novak — Registered Nurse (Croatia → Germany), reference date 2026-09-14.\n\nNursing is a regulated profession in Germany governed by the Pflegeberufegesetz (PflBG). The competent authority is the state-level Anerkennungsbehörde in whichever Bundesland Lena will work. There is no single national licensing exam; instead, the authority conducts a direct equivalency assessment of the Croatian qualification against the German standard.\n\nKey facts driving this pathway:\n• Croatia is an EU member state, but the automatic mutual-recognition route for nurses under EU Directive 2005/36/EC requires specific minimum training hours. If Lena's diploma meets those thresholds, the process may be faster (~3 months total). The pathway below assumes the more common scenario where a formal assessment is required and a Defizitbescheid is issued (~85% of non-EU-route applicants).\n• Language: B2 general German PLUS the Fachsprachprüfung (specialist medical/nursing language exam) are both mandatory and must be valid at the registration decision date — not merely at application. Under the Recognition Partnership (since 2024-03-01), Lena may enter Germany and work under supervision from A2/B1 level while completing her language training.\n• No separate licensing exam (no Staatsexamen equivalent) — the bridging requirement is the Anpassungslehrgang (adaptation course) or Kenntnisprüfung if deficits are found.\n\nEstimated realistic timeline (if Defizitbescheid issued):\n• Step 1 — Identify authority: by 2026-10-14\n• Step 2 — Submit equivalency application: 2026-10-14; decision: ~2027-01-14\n• Step 3 — B2 certificate: ~2027-03-14; Fachsprachprüfung: ~2027-06-14 (running in parallel)\n• Step 4 — Police clearance + health certificate: request 2027-04-14\n• Step 5 — Adaptation course (if required): 2027-02-14 to ~2027-08-14\n• Step 6 — Licence granted: estimated 2027-09-14\n\nTotal estimated time to licence: approximately 12 months from 2026-09-14. If the EU automatic-recognition route applies, this could shorten to 3–4 months. Lena should engage a qualified German immigration/recognition advisor and contact her target Bundesland authority early to clarify which route applies.",
+          "flag": false
+        },
+        "regulator": "State recognition authority (Anerkennungsbehörde des Bundeslandes)",
+        "regulatorUrl": "https://www.anerkennung-in-deutschland.de/en/interest/finder/profession"
+      },
+      "scores": {
+        "contract": {
+          "ok": true,
+          "problems": []
+        },
+        "grounding": {
+          "steps": 6,
+          "sourced": 6,
+          "off_jurisdiction": 0,
+          "off_ruleset": 0,
+          "off_kb": 0,
+          "null": 0,
+          "bad_urls": [],
+          "regulator_url": "sourced",
+          "ok": true,
+          "target_ruleset_url_count": 2
+        },
+        "semantics": {
+          "ok": true,
+          "checks": {
+            "flag_false": true
+          },
+          "problems": []
+        }
+      },
+      "no_upstream": false,
+      "passed": true
+    },
+    {
+      "id": "rn-ny-build",
+      "event": "build_pathway",
+      "check": "build",
+      "request": {
+        "profile": {
+          "name": "Mateus Silva",
+          "profession": "Registered Nurse",
+          "countryTrained": "Brazil",
+          "targetCountry": "United States",
+          "targetRegion": "New York"
+        },
+        "event": "build_pathway",
+        "currentSteps": []
+      },
+      "http_status": 200,
+      "elapsed_ms": 25890,
+      "response": {
+        "steps": [
+          {
+            "id": 1,
+            "title": "CGFNS Credentials Evaluation (CES)",
+            "status": "not-started",
+            "detail": "Submit your Brazilian nursing transcripts, diploma, and licensure documents to CGFNS (now operating as TruMerit) for a course-by-course evaluation of your foreign nursing education. This is a mandatory gateway before NYSED will assess your NCLEX-RN eligibility. Typical processing time is 4–6 months. Target submission: 2026-09-14; expected completion: 2027-03-14.",
+            "source": "CGFNS / TruMerit",
+            "sourceUrl": "https://www.cgfns.org/services/"
+          },
+          {
+            "id": 2,
+            "title": "English Proficiency — TOEFL iBT",
+            "status": "not-started",
+            "detail": "Because your nursing education was conducted in Portuguese (Brazil), NYSED requires evidence of English proficiency via the TOEFL iBT. The score must remain valid (24-month window) at the point of NYSED's registration decision. Recommended test date: 2026-11-01, giving a validity window of 2026-11-01 to 2028-11-01 — well past the projected licensure decision of 2027-07-14. Scores are sent directly to NYSED.",
+            "source": "NYSED Office of the Professions",
+            "sourceUrl": "https://www.op.nysed.gov/professions/registered-professional-nursing"
+          },
+          {
+            "id": 3,
+            "title": "NYSED NCLEX-RN Eligibility Application",
+            "status": "not-started",
+            "detail": "Once your CGFNS CES evaluation is complete (expected 2027-03-14), apply to NYSED for authorization to take the NCLEX-RN. NYSED reviews your CES report and TOEFL score and issues an Authorization to Test (ATT) via Pearson VUE. Submit application ~2027-03-14; allow 4–8 weeks for eligibility determination.",
+            "source": "NYSED Office of the Professions",
+            "sourceUrl": "https://www.op.nysed.gov/professions/registered-professional-nursing"
+          },
+          {
+            "id": 4,
+            "title": "NCLEX-RN Examination",
+            "status": "not-started",
+            "detail": "Sit the NCLEX-RN through Pearson VUE after receiving your ATT. This is the national licensure examination required for RN registration in all U.S. states including New York. Schedule as soon as your ATT is issued. Projected exam window: 2027-05-14 to 2027-06-14. Results are reported to NYSED automatically.",
+            "source": "NCSBN",
+            "sourceUrl": "https://www.ncsbn.org/exams.page"
+          },
+          {
+            "id": 5,
+            "title": "NYSED Licensure Application & First Registration",
+            "status": "not-started",
+            "detail": "After passing the NCLEX-RN (projected pass ~2027-06-14), NYSED processes your full licensure and issues your New York RN licence and first registration. Confirm that your TOEFL score is still on file (validity: 2028-11-01 ✓). Projected licensure decision: 2027-07-14. You may then begin practising as a Registered Nurse in New York State.",
+            "source": "NYSED Office of the Professions",
+            "sourceUrl": "https://www.op.nysed.gov/"
+          }
+        ],
+        "logEntry": {
+          "text": "Pathway built for Mateus Silva — Brazil-trained Registered Nurse targeting licensure in New York State.\n\nRegulator: NYSED Office of the Professions. Gateway body: CGFNS (now TruMerit).\n\nThe pathway has 5 ordered steps with the following dependencies:\n• Step 1 (CGFNS CES) is the critical gateway — NYSED will not assess NCLEX eligibility without it. Submit immediately; expect completion ~2027-03-14.\n• Step 2 (TOEFL iBT) is required because Mateus trained in Brazil (Portuguese-medium education). Take the exam by 2026-11-01 to secure a 24-month validity window (valid until 2028-11-01), which safely covers the projected NYSED registration decision of 2027-07-14.\n• Step 3 (NYSED eligibility application) can begin once Step 1 is complete (~2027-03-14), and requires the TOEFL score to be on file.\n• Step 4 (NCLEX-RN via Pearson VUE) requires an Authorization to Test (ATT) from NYSED. Projected exam window: 2027-05-14 to 2027-06-14.\n• Step 5 (NYSED licence & first registration) follows NCLEX passage; projected decision: 2027-07-14.\n\nEstimated total timeline from today (2026-09-14) to licensure: approximately 10 months, with the CGFNS CES evaluation being the longest single bottleneck (~4–6 months). Beginning both Step 1 and Step 2 concurrently as soon as possible is strongly recommended.",
+          "flag": false
+        },
+        "regulator": "NYSED Office of the Professions",
+        "regulatorUrl": "https://www.op.nysed.gov/professions/registered-professional-nursing"
+      },
+      "scores": {
+        "contract": {
+          "ok": true,
+          "problems": []
+        },
+        "grounding": {
+          "steps": 5,
+          "sourced": 5,
+          "off_jurisdiction": 0,
+          "off_ruleset": 0,
+          "off_kb": 0,
+          "null": 0,
+          "bad_urls": [],
+          "regulator_url": "sourced",
+          "ok": true,
+          "target_ruleset_url_count": 5
+        },
+        "semantics": {
+          "ok": true,
+          "checks": {
+            "flag_false": true
+          },
+          "problems": []
+        }
+      },
+      "no_upstream": false,
+      "passed": true
+    }
+  ]
+}

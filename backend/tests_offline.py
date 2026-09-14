@@ -66,7 +66,7 @@ bad = [str(x.message) for x in w if "Invalid configuration" in str(x.message) or
 assert not bad, bad
 assert isinstance(a, Agent) and isinstance(a.model, BedrockModel) and isinstance(h.model, BedrockModel)
 for m in (a.model, h.model):  # no sampling params: current Claude models reject temperature
-    assert m.config["max_tokens"] == 3000 and m.config.get("temperature") is None, m.config
+    assert m.config["max_tokens"] == 8000 and m.config.get("temperature") is None, m.config
 assert set(h.tool_names) & {"web_fetch", "http_request"}, h.tool_names
 assert set(a.tool_names) == {"get_regulator_rules", "months_between", "today"}
 print(f"OK  build_agent / build_harvester (tool={h.tool_names}) / build_case_graph offline")
@@ -98,7 +98,7 @@ ANTH = {"CREDBRIDGE_PROVIDER": "anthropic", "ANTHROPIC_API_KEY": "offline", "CRE
 aa, ha = with_env(ANTH, lambda: (build_agent().model, build_harvester().model))
 for m in (aa, ha):  # provider switch, no network call at construction
     assert isinstance(m, AnthropicModel), type(m)
-    assert m.config["model_id"] == "claude-sonnet-5" and m.config["max_tokens"] == 3000 and not m.config.get("params")
+    assert m.config["model_id"] == "claude-sonnet-5" and m.config["max_tokens"] == 8000 and not m.config.get("params")
 am = with_env({**ANTH, "CREDBRIDGE_MODEL": "claude-opus-5"}, lambda: build_agent().model)
 assert am.config["model_id"] == "claude-opus-5", am.config
 try:  # fail fast: anthropic without a key raises at build time, not on the first request

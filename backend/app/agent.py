@@ -22,7 +22,7 @@ log = logging.getLogger("credbridge.agent")
 # Model + date env (CREDBRIDGE_PROVIDER/MODEL, AWS_REGION, CREDBRIDGE_TODAY) is read at CALL time, not
 # import, so a load_dotenv() that runs after `import app.agent` still applies. _model() caches the
 # model per process, so set the env before the first request.
-BEDROCK_DEFAULT_MODEL = "us.anthropic.claude-3-7-sonnet-20250219-v1:0"
+BEDROCK_DEFAULT_MODEL = "us.anthropic.claude-sonnet-4-6"  # verified live on Bedrock us-west-2, 2026-09-13
 ANTHROPIC_DEFAULT_MODEL = "claude-sonnet-5"
 
 
@@ -92,6 +92,7 @@ Rules:
   complete|in-progress|upcoming|not-started|at-risk, detail:str, source:str, sourceUrl:str}.
   Put the regulator name in `source` and its URL in `sourceUrl` on the steps that come from it.
 - ids are 1..n in presentation order, no gaps.
+- Write every date in logEntry.text and step detail as ISO YYYY-MM-DD (e.g. 2027-03-14).
 - Dates in detail text must be concrete and internally consistent; use the today tool + months_between
   to reason about validity windows rather than guessing.
 - Keep logEntry.text plain-language and specific. Never output anything except the structured object."""
@@ -100,7 +101,7 @@ Rules:
 TOOLS = [get_regulator_rules, months_between, today]
 
 
-def make_model(model_id: str | None = None, max_tokens: int = 3000) -> Model:
+def make_model(model_id: str | None = None, max_tokens: int = 8000) -> Model:
     """Model for every Credential Bridge agent. CREDBRIDGE_PROVIDER picks the provider:
     'bedrock' (default; CREDBRIDGE_MODEL + AWS_REGION) or 'anthropic' (Claude API; key from
     ANTHROPIC_API_KEY; needs strands-agents[anthropic]) — a fallback while Bedrock access is pending.
