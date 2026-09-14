@@ -60,8 +60,11 @@ boring.
 Without AWS, `backend/tests_smoke.py` asserts that every ruleset in `kb/store` is reachable from a
 natural-language profile and that an unknown country never lands on a guessed jurisdiction. With
 Bedrock, the check is simple: take each `sourceUrl` in a response and confirm it appears in the KB or
-fallback data for that profile. _[TODO(team): add the result from docs/evidence/ before publishing.]_
+fallback data for that profile. In our live run of 7 scenarios (`docs/evidence/eval-20260914T012945Z.json`),
+52 of 55 steps cited a URL from the target jurisdiction's curated ruleset, none cited an
+off-jurisdiction or invented URL, and 3 carried no citation. That shows provenance, not correctness:
+every link is traceable, but a human still has to confirm what each step says.
 
 Next post: making the agent's *judgment* the thing the audience actually sees.
 
-*Built with the Strands Agents SDK and Amazon Bedrock (Claude 3.7 Sonnet, us-west-2).*
+*Built with the Strands Agents SDK and Claude Sonnet 4.6 (us.anthropic.claude-sonnet-4-6) on Amazon Bedrock, us-west-2.*

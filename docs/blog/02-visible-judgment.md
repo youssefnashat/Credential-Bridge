@@ -9,21 +9,26 @@ produces the same screen. The evidence that you built an agent is a moment where
 checklist can't: catch a problem, reason about it, and explain the trade-off.
 
 ## The moment we built the demo around
-In our Ontario nursing ruleset, the language test has `validity_months: 24` and
-`valid_at: "registration_decision"` — it must still be valid when the College of Nurses of Ontario makes
-its decision, not just when the applicant applies. If the credential evaluation or exam timeline slips,
-a result that was fine at application can expire before the decision. A list shows both items green.
+Our Ontario nursing ruleset records *when* each document has to be valid, not just that it's required.
+The language test has `validity_months: 24` and the police criminal record check has
+`validity_months: 6`. Both carry `valid_at: "registration_decision"`: each must still be valid when the
+College of Nurses of Ontario decides, not merely when the applicant applies. If the credential
+assessment slips, a document that was fine at application can expire before the decision. A list shows
+both items green.
 
 On a `simulate_delay` event, the agent gets the current steps, calls its grounding tool, and is
-instructed to find a real dependent pair that no longer lines up, mark the affected steps `at-risk`,
-and explain it with actual dates. The kind of explanation it is prompted to produce looks like this
-(*illustrative — not a captured output*):
+instructed to find a real dependent pair that no longer lines up, mark the affected steps `at-risk`, and
+explain it with actual dates. We don't tell it which pair. In our live evaluation run (Claude Sonnet 4.6,
+with `today` at 2026-09-14), it marked the credential assessment and the police check at risk and wrote
+this (an excerpt from scenario `rn-on-delay` in `docs/evidence/eval-20260914T012945Z.json`):
 
-> "Your IELTS result is valid until 2027-05-02, but with the evaluation delay your CNO registration
-> decision now falls after that date. CNO needs the language result to be valid at the decision, so
-> book a retake that will still be valid then."
+> "ACUTE EXPIRY COLLISION — Step 8 (Criminal Record Check): The check was planned to be ordered on
+> 2027-03-01, producing a result valid for 6 months until 2027-09-01. The revised registration decision
+> date of 2027-09-15 falls 14 days AFTER that expiry. If ordered as planned, CNO will reject the expired
+> check and require a new one — adding further delay and a second Sterling Backcheck fee."
 
-_[TODO(team): replace with a real logEntry from docs/evidence/ before publishing.]_
+Its recommendation was to move the Sterling Backcheck order from 2027-03-01 to 2027-04-01, so the result
+stays valid until 2027-10-15, past the revised decision date.
 
 That paragraph isn't templated. The date math lives in deterministic tools (`today`, pinnable via
 `CREDBRIDGE_TODAY`, and `months_between`); the *decision* — which pair collides, why it matters, what to

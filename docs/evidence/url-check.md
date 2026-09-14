@@ -33,7 +33,7 @@ Key to "where used": `store/X/y#source` is a ruleset source; `#reqN` is a requir
 | https://www.nursingmidwiferyboard.gov.au/ | store/AU#req3, #req4 | OK (homepage) | same | None |
 | https://www.bccnm.ca/RN/applications_registration/Pages/Default.aspx | store/CA-BC#source, #req2; regs | OK | same | None |
 | https://www.bccnm.ca/ | store/CA-BC#req3 | OK (homepage) | https://www.bccnm.ca/Pages/Default.aspx | None |
-| https://www.nnas.ca/ | store/CA-BC#req1, CA-ON#req1 | OK (homepage) | same | None |
+| https://www.nnas.ca/ | store/CA-BC#req1 | OK (homepage) | same | None. CA-ON#req1 no longer cites NNAS: since 3d13057 it cites https://www.cno.org/become-a-nurse/approved-educational-credential-assessment-service-providers (200 on 2026-09-13; CNO's list of approved ECA providers). |
 | https://www.cno.org/ | store/CA-ON#req3, #req5 | OK (homepage) | same | None |
 | https://www.anerkennung-in-deutschland.de/en/interest/finder/profession | store/DE#source, #req1; regs | OK | same | None |
 | https://www.anerkennung-in-deutschland.de/ | store/DE#req2–#req5 | OK (homepage) | https://www.anerkennung-in-deutschland.de/html/de/index.php | None |
@@ -57,7 +57,7 @@ Key to "where used": `store/X/y#source` is a ruleset source; `#reqN` is a requir
 
 ## For a human to check
 1. **`regulators.json` still holds 7 dead URLs**: CNO IEN, NMC, BRN lic-intl, CRNA, Texas BON, NYSED PE and NYSED teacher. If the backend fills `regulatorUrl` from this file, the demo can still show a 404. The same-domain replacements verified above can be swapped in by the backend owner.
-2. **CA-ON nurse, NNAS step**: CNO's current outside-Canada guide names approved education credential assessment (ECA) providers, not NNAS. Re-verify `gateway: "NNAS"` and req1.
+2. **CA-ON nurse, NNAS step**: resolved in `3d13057`. The gateway is now "Approved ECA provider (WES / ICAS / ICES-BCIT)", and req1 cites CNO's approved-provider page. CNO has required an approved ECA since 2025-04-01 and accepts NNAS only via TruMerit expedited reports.
 3. **US-CA nurse, language step**: the BRN guideline (CCR 1413) requires an English exam only when the Board has "reasonable doubt" and does not name TOEFL. Re-verify req2's name and `validity_months`.
 4. **CA-ON civil engineer**: the PEO pages can't be fetched past Cloudflare. A search snippet from peo.on.ca says the minimum experience changed from four years to two on July 1, 2026, while req3 says "48 months". Check this in a browser.
 5. **GB registry source**: `cpq.ecctis.com` no longer resolves. Search says the UK CPQ "is no longer able to support users of the Regulated Professions Register"; the official successor is https://www.regulated-professions.service.gov.uk/ (200). That is a GOV.UK domain, not Ecctis, so it was left for a human decision.
