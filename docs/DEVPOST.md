@@ -81,7 +81,7 @@ Behind the UI is one contract, `POST /reason`. A stateful variant (`POST /sessio
 python · strands-agents · amazon-bedrock · anthropic-claude (Claude Sonnet 4.6) · amazon-bedrock-agentcore · fastapi · pydantic · uvicorn · boto3 · json-schema · javascript · html · css
 
 ## Links
-- Repository: _TODO(team): public GitHub URL (Apache-2.0)_
+- Repository: https://github.com/youssefnashat/Credential-Bridge (Apache-2.0)
 - Video: _TODO(team): public YouTube/Vimeo link (≤5 min)_
 - Live demo: the AgentCore Runtime (`credential_bridge`, us-west-2) needs AWS-signed requests, so there's no public URL. The web UI runs locally against FastAPI; see the README's *Run it*.
 - Architecture diagram: `docs/architecture.png`
