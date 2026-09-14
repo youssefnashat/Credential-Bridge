@@ -136,10 +136,15 @@ def _fresh(agent: Agent | None) -> Agent:
     between applicants) and raises ConcurrencyException on overlapping calls, so the shared agent
     passed by api/orchestrator is only a template: we reuse its model + prompt, never its state."""
     if agent is None:
-        return build_agent()
+        agent = build_agent()
     if not isinstance(agent, Agent):
         return agent  # test doubles
-    return Agent(model=agent.model, tools=TOOLS, system_prompt=agent.system_prompt, callback_handler=None)
+    model = agent.model
+    if type(model).__name__ == "AnthropicModel":
+        # its async HTTP client is bound to the event loop that created it; every Agent call runs its own
+        # loop (often on another thread), so sharing it across calls fails with "Event loop is closed"
+        model = make_model()
+    return Agent(model=model, tools=TOOLS, system_prompt=agent.system_prompt, callback_handler=None)
 
 
 def _task(req: ReasonRequest) -> str:
