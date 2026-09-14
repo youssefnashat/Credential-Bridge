@@ -9,6 +9,13 @@ description: The sprint build loop — how the orchestrator session picks tasks 
   Each owns the files in its description. Edits only the task's `files`. Never commits.
 - **qa-verifier**: read-only gate. Every task passes it before commit.
 
+# Lane sessions
+Other Claude Code sessions join the loop as **lanes** (docs/LANES.md): each owns a set of files and
+runs its tasks in parallel with the orchestrator's subagents. The orchestrator assigns lane tasks by
+SendMessage, never assigns a lane a task whose files are RUNNING elsewhere, and treats a lane's
+`DONE T#` message exactly like a returning subagent (step 4). When a subagent finishes a task in a
+lane's area, later tasks in that area go to the lane session instead of a new subagent.
+
 # One tick
 1. Read docs/TASKS.md + last 12 lines of docs/CONTEXT_LOG.md. Re-check BLOCKED reasons (did a human gate clear?).
 2. Pick up to 3 READY tasks, highest pri first, whose `files` don't overlap each other or anything RUNNING.
