@@ -8,9 +8,14 @@
 import json, logging, time
 from pathlib import Path
 
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
+
+# backend/.env, resolved from this file so any cwd works. Must run BEFORE .agent is imported: agent.py
+# reads CREDBRIDGE_MODEL/AWS_REGION/CREDBRIDGE_TODAY at import. override=False: real env vars win.
+load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=False)
 
 from .schemas import ReasonRequest, ReasonResponse
 from .agent import build_agent, reason
