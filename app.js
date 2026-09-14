@@ -31,7 +31,13 @@
     'in-progress': { label: 'In progress', tone: 'amber' },
     'upcoming':    { label: 'Upcoming',    tone: 'mute'  },
     'not-started': { label: 'Not started', tone: 'mute'  },
+    'waiting':     { label: 'Waiting',     tone: 'mute'  },
     'at-risk':     { label: 'At risk',     tone: 'rust'  }
+  };
+
+  var DOC_TONES = {
+    'missing':  { label: 'Not uploaded', tone: 'mute' },
+    'on-file':  { label: 'On file',      tone: 'teal' }
   };
 
   var ENTRY_KINDS = {
@@ -39,6 +45,7 @@
     watch:     { label: 'Monitoring', tone: 'mute'  },
     conflict:  { label: 'Conflict',   tone: 'amber' },
     rejection: { label: 'Rejection',  tone: 'rust'  },
+    document:  { label: 'Document',   tone: 'teal'  },
     reset:     { label: 'Reset',      tone: 'mute'  }
   };
 
@@ -57,10 +64,37 @@
   function fmtDate(date) {
     return date.getDate() + ' ' + MONTHS[date.getMonth()] + ' ' + date.getFullYear();
   }
-  function daysAgo(n) { return new Date(Date.now() - n * 86400000); }
   function clockTime() {
     var d = new Date(), p = function (n) { return String(n).padStart(2, '0'); };
     return p(d.getHours()) + ':' + p(d.getMinutes()) + ':' + p(d.getSeconds());
+  }
+  function fileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return Math.round(bytes / 1024) + ' KB';
+    return (bytes / 1048576).toFixed(1) + ' MB';
+  }
+  function docFor(id) {
+    return state.docs.filter(function (d) { return d.id === id; })[0];
+  }
+  /* A requirement counts as unmet when the file is absent or has been
+     returned. This is the one rule that ties the sidebar to the timeline. */
+  function missingFor(step) {
+    return (step.requires || []).filter(function (id) {
+      var d = docFor(id);
+      return !d || d.status === 'missing' || d.status === 'rejected';
+    });
+  }
+  /* A step's displayed status is derived, never stored: the agent owns
+     'at-risk', the documents own everything else. */
+  function derivedStatus(step) {
+    if (step.status === 'at-risk') return 'at-risk';
+    if (missingFor(step).length) return 'waiting';
+    if (step.completeOnDocs) return 'complete';
+    return step.status;
+  }
+  function listOf(items) {
+    if (items.length <= 1) return items[0] || '';
+    return items.slice(0, -1).join(', ') + ' and ' + items[items.length - 1];
   }
   function chip(label, tone) {
     return '<span class="chip chip--' + tone + '">' + escapeHtml(label) + '</span>';
@@ -68,6 +102,7 @@
 
   /* ═══ Intake ═════════════════════════════════════════════════════════ */
   var form = $('intake-form');
+  var elCountry = $('in-country');
   var elTrained = $('in-trained');
   var elTrainedRegion = $('in-trained-region');
   var elRegion = $('in-region');
@@ -82,13 +117,12 @@
   };
 
   function readForm() {
-    var checked = form.querySelector('input[name="country"]:checked');
     return {
       name: $('in-name').value.trim(),
       profession: $('in-profession').value,
       trainedIn: elTrained.value,
       trainedInRegion: trainedRegionShown() ? elTrainedRegion.value : '',
-      country: checked ? checked.value : '',
+      country: elCountry.value,
       region: elRegion.value
     };
   }
@@ -109,6 +143,14 @@
 
   function populateTrainedIn() {
     CB.COUNTRIES.forEach(function (c) { elTrained.appendChild(new Option(c, c)); });
+  }
+
+  /* Driven by CB.REGIONS, so a new target country appears here as soon as
+     it has regions, a regulator set and pathways in pathways.js. */
+  function populateTargetCountries() {
+    Object.keys(CB.REGIONS).forEach(function (c) {
+      elCountry.appendChild(new Option(c, c));
+    });
   }
 
   function trainedRegionShown() {
@@ -143,23 +185,23 @@
   }
 
   function populateRegions() {
-    var checked = form.querySelector('input[name="country"]:checked');
+    var country = elCountry.value;
     var previous = elRegion.value;
     elRegion.innerHTML = '';
 
-    if (!checked) {
+    if (!country) {
       elRegion.disabled = true;
       elRegion.appendChild(new Option('Choose a target country first', ''));
       return;
     }
 
     /* You cannot target the region you trained in — you are already there. */
-    var alreadyThere = (elTrained.value === checked.value && trainedRegionShown())
+    var alreadyThere = (elTrained.value === country && trainedRegionShown())
       ? elTrainedRegion.value : '';
 
     elRegion.disabled = false;
     elRegion.appendChild(new Option('Choose a region', ''));
-    CB.REGIONS[checked.value].forEach(function (r) {
+    CB.REGIONS[country].forEach(function (r) {
       var blocked = (r !== '' && r === alreadyThere);
       var opt = new Option(blocked ? r + ' — where you trained' : r, r);
       opt.disabled = blocked;
@@ -234,23 +276,29 @@
     return 'CB-' + new Date().getFullYear() + '-' + n;
   }
 
-  function freshDocs() {
-    var ages = [126, 84, 141, 62];
-    return CB.DOCUMENTS.map(function (d, i) {
-      return {
-        id: d.id,
-        name: d.name,
-        status: 'Verified',
-        tone: 'teal',
-        received: fmtDate(daysAgo(ages[i % ages.length]))
-      };
+  /* Only the documents this pathway actually uses, all empty to begin
+     with. Nothing is pre-filled, because nothing has been uploaded. */
+  function freshDocs(steps) {
+    return CB.requiredDocsFor(steps).map(function (d) {
+      return { id: d.id, name: d.name, hint: d.hint, file: null, status: 'missing',
+               label: DOC_TONES.missing.label, tone: DOC_TONES.missing.tone };
+    });
+  }
+
+  /* Clear agent-applied flags but keep the files the user uploaded. */
+  function relabelDocs() {
+    state.docs.forEach(function (d) {
+      d.status = d.file ? 'on-file' : 'missing';
+      var meta = DOC_TONES[d.status];
+      d.label = meta.label;
+      d.tone = meta.tone;
     });
   }
 
   function openCase(values) {
     state.profile = Object.assign({}, values, { caseRef: makeCaseRef() });
     state.steps = CB.buildPathway(state.profile);
-    state.docs = freshDocs();
+    state.docs = freshDocs(state.steps);
     state.log = [];
     state.tie = null;
     state.drafts = CB.getDrafts(state.profile, fmtDate(new Date()));
@@ -258,7 +306,8 @@
     /* Ask the agent for its opening read on the case. */
     applyReasoning(CB.getAgentReasoning(state.profile, {
       type: 'pathway.build',
-      steps: state.steps
+      steps: state.steps,
+      documents: state.docs
     }));
 
     $('intake').hidden = true;
@@ -286,7 +335,7 @@
 
     if (result.rebuild) {
       state.steps = CB.buildPathway(state.profile);
-      state.docs = freshDocs();
+      relabelDocs();
       state.tie = null;
     }
 
@@ -297,38 +346,30 @@
       if (u.flag) step.flag = u.flag;
     });
 
-    if (result.insertAfter) {
+    /* The remediation step goes in front of the first step it unblocks. */
+    if (result.insertBefore) {
       var at = -1;
-      state.steps.forEach(function (s, i) { if (s.id === result.insertAfter.afterId) at = i; });
-      var already = state.steps.some(function (s) { return s.id === result.insertAfter.step.id; });
+      state.steps.forEach(function (s, i) { if (s.id === result.insertBefore.beforeId) at = i; });
+      var already = state.steps.some(function (s) { return s.id === result.insertBefore.step.id; });
       if (at >= 0 && !already) {
-        state.steps.splice(at + 1, 0, Object.assign(
-          { blockedBy: null, flag: null }, result.insertAfter.step
-        ));
-      }
-    }
-
-    if (result.blockFrom) {
-      var pivot = -1;
-      state.steps.forEach(function (s, i) { if (s.id === result.blockFrom) pivot = i; });
-      if (pivot >= 0) {
-        for (var i = pivot + 1; i < state.steps.length; i++) {
-          if (state.steps[i].status === 'complete') continue;
-          state.steps[i].blockedBy = pivot + 1;
-        }
+        state.steps.splice(at, 0, Object.assign({ flag: null }, result.insertBefore.step));
       }
     }
 
     (result.docUpdates || []).forEach(function (u) {
-      var doc = state.docs.filter(function (d) { return d.id === u.id; })[0];
+      var doc = docFor(u.id);
       if (!doc) return;
-      doc.status = u.status;
+      if (u.state) doc.status = u.state;
+      doc.label = u.status;
       doc.tone = u.tone;
     });
 
     if (result.tie) state.tie = result.tie;
 
-    (result.entries || []).forEach(function (entry) {
+    /* The log reads newest first, but entries within one response are
+       authored in reading order, so reverse before unshifting to keep the
+       agent's own ordering intact at the top of the panel. */
+    (result.entries || []).slice().reverse().forEach(function (entry) {
       state.log.unshift(Object.assign({ time: clockTime(), isNew: true }, entry));
     });
   }
@@ -354,12 +395,50 @@
     $('side-target').textContent = p.region + ', ' + p.country;
 
     $('docs').innerHTML = state.docs.map(function (d) {
-      return '<li class="doc">' +
-        '<span><span class="doc__name">' + escapeHtml(d.name) + '</span>' +
-        '<span class="doc__date">Received ' + escapeHtml(d.received) + '</span></span>' +
-        chip(d.status, d.tone) +
+      var body;
+      if (d.file) {
+        body = '<p class="doc__file">' +
+            '<span class="doc__filename">' + escapeHtml(d.file.name) + '</span>' +
+            '<span class="doc__filemeta">' + escapeHtml(d.file.size) + ' \u00b7 added ' + escapeHtml(d.file.added) + '</span>' +
+          '</p>' +
+          '<button class="doc__remove" type="button" data-remove="' + escapeHtml(d.id) + '">Remove</button>';
+      } else {
+        body = '<p class="doc__hint">' + escapeHtml(d.hint) + '</p>' +
+          '<label class="doc__upload">Choose file' +
+            '<input type="file" data-upload="' + escapeHtml(d.id) + '">' +
+          '</label>';
+      }
+      return '<li class="doc doc--' + escapeHtml(d.status) + '">' +
+        '<div class="doc__row">' +
+          '<span class="doc__name">' + escapeHtml(d.name) + '</span>' +
+          chip(d.label, d.tone) +
+        '</div>' + body +
       '</li>';
     }).join('');
+
+    var onFile = state.docs.filter(function (d) { return d.file; });
+    var usable = state.docs.filter(function (d) { return d.status === 'on-file'; });
+    $('docs-tally').textContent =
+      usable.length + ' of ' + state.docs.length + ' ready' +
+      (onFile.length > usable.length ? ' \u00b7 ' + (onFile.length - usable.length) + ' needs attention' : '');
+
+    /* You can only return a document that has actually been submitted. */
+    var pick = $('sim-reject-doc');
+    var previous = pick.value;
+    pick.innerHTML = '';
+    if (!onFile.length) {
+      pick.appendChild(new Option('Upload a document first', ''));
+      pick.disabled = true;
+      $('sim-rejection').disabled = true;
+    } else {
+      onFile.forEach(function (d) {
+        var opt = new Option(d.name, d.id);
+        opt.selected = (d.id === previous);
+        pick.appendChild(opt);
+      });
+      pick.disabled = false;
+      $('sim-rejection').disabled = false;
+    }
   }
 
   var MARKER_CHECK = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 5.2l2.4 2.4L8.6 2.7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -381,16 +460,23 @@
 
     var tl = $('timeline');
     tl.innerHTML = state.steps.map(function (step, i) {
-      var meta = STATUS[step.status] || STATUS['not-started'];
-      var blocked = !!step.blockedBy;
-      var classes = ['step', 'step--' + step.status];
-      if (blocked) classes.push('step--blocked');
-      if (step.isRemedy && step.status !== 'at-risk') classes.push('step--remedy');
+      var status = derivedStatus(step);
+      var meta = STATUS[status] || STATUS['not-started'];
+      var missing = missingFor(step);
+      var classes = ['step', 'step--' + status];
+      if (step.isRemedy && status !== 'at-risk') classes.push('step--remedy');
 
       var glyph = '';
-      if (step.status === 'complete') glyph = MARKER_CHECK;
-      else if (step.status === 'at-risk') glyph = MARKER_BANG;
-      else if (step.isRemedy) glyph = MARKER_BANG;
+      if (status === 'complete') glyph = MARKER_CHECK;
+      else if (status === 'at-risk' || step.isRemedy) glyph = MARKER_BANG;
+
+      /* Every step names the documents it runs on, so the sidebar and the
+         timeline read as one thing rather than two unrelated panels. */
+      var needs = (step.requires || []).map(function (id) {
+        var d = docFor(id);
+        if (!d) return '';
+        return '<span class="need need--' + escapeHtml(d.status) + '">' + escapeHtml(d.name) + '</span>';
+      }).join('');
 
       return '<li class="' + classes.join(' ') + '" data-step="' + escapeHtml(step.id) + '">' +
         '<span class="step__num">' + String(i + 1).padStart(2, '0') + '</span>' +
@@ -401,13 +487,16 @@
               '<h3 class="card__title">' + escapeHtml(step.title) + '</h3>' +
               '<p class="card__authority">' + escapeHtml(step.authority) + '</p>' +
             '</div>' +
-            (blocked && step.status !== 'at-risk'
-              ? chip('Blocked', 'mute') : chip(meta.label, meta.tone)) +
+            chip(meta.label, meta.tone) +
           '</div>' +
           '<p class="card__detail">' + escapeHtml(step.detail) + '</p>' +
+          (needs ? '<p class="card__needs"><span class="card__needslabel">Runs on</span>' + needs + '</p>' : '') +
+          (missing.length
+            ? '<p class="card__waiting">Waiting on ' + escapeHtml(listOf(missing.map(function (id) {
+                var d = docFor(id); return d ? d.name.toLowerCase() : id;
+              }))) + '</p>'
+            : '') +
           (step.flag ? '<p class="card__flag">' + escapeHtml(step.flag) + '</p>' : '') +
-          (blocked ? '<p class="card__blocked">Held until step ' +
-              String(step.blockedBy).padStart(2, '0') + ' clears</p>' : '') +
         '</div>' +
       '</li>';
     }).join('');
@@ -491,31 +580,119 @@
   }
 
   /* ═══ Toasts ═════════════════════════════════════════════════════════ */
+  var TOAST_LIMIT = 3;
+
+  function dismiss(el) {
+    if (!el.parentNode || el.classList.contains('toast--out')) return;
+    el.classList.add('toast--out');
+    setTimeout(function () { el.remove(); }, 260);
+  }
+
   function toast(message) {
+    var stack = $('toaster');
     var el = document.createElement('div');
     el.className = 'toast';
     el.textContent = message;
-    $('toaster').appendChild(el);
-    setTimeout(function () {
-      el.classList.add('toast--out');
-      setTimeout(function () { el.remove(); }, 260);
-    }, 3600);
+    stack.appendChild(el);
+
+    /* Uploading several documents in a row must not bury the page behind
+       a column of toasts. Oldest out first. */
+    var live = stack.querySelectorAll('.toast:not(.toast--out)');
+    for (var i = 0; i < live.length - TOAST_LIMIT; i++) dismiss(live[i]);
+
+    setTimeout(function () { dismiss(el); }, 3600);
   }
 
-  /* ═══ Wiring ═════════════════════════════════════════════════════════ */
-  function simulate(type, note) {
-    applyReasoning(CB.getAgentReasoning(state.profile, { type: type, steps: state.steps }));
+  /* ═══ Documents ══════════════════════════════════════════════════════
+     Uploading is a fact, not a judgement, so the file is recorded here.
+     What it means for the pathway still comes from the agent.
+     The File never leaves the tab: only its name and size are read.
+     ═══════════════════════════════════════════════════════════════════ */
+  function attachFile(docId, file) {
+    var doc = docFor(docId);
+    if (!doc || !file) return;
+
+    doc.file = { name: file.name, size: fileSize(file.size), added: clockTime() };
+    doc.status = 'on-file';
+    doc.label = DOC_TONES['on-file'].label;
+    doc.tone = DOC_TONES['on-file'].tone;
+
+    applyReasoning(CB.getAgentReasoning(state.profile, {
+      type: 'document.uploaded',
+      steps: state.steps,
+      documents: state.docs,
+      document: doc
+    }));
+
     renderSidebar();
     renderPathway();
     renderLog();
-    toast(note);
+    toast(doc.name + ' added to the case file.');
+  }
+
+  function detachFile(docId) {
+    var doc = docFor(docId);
+    if (!doc || !doc.file) return;
+    var removed = { id: doc.id, name: doc.name };
+
+    doc.file = null;
+    doc.status = 'missing';
+    doc.label = DOC_TONES.missing.label;
+    doc.tone = DOC_TONES.missing.tone;
+
+    applyReasoning(CB.getAgentReasoning(state.profile, {
+      type: 'document.removed',
+      steps: state.steps,
+      documents: state.docs,
+      document: removed
+    }));
+
+    renderSidebar();
+    renderPathway();
+    renderLog();
+    toast(removed.name + ' removed.');
+  }
+
+  $('docs').addEventListener('change', function (e) {
+    var input = e.target.closest('[data-upload]');
+    if (!input || !input.files || !input.files.length) return;
+    attachFile(input.getAttribute('data-upload'), input.files[0]);
+  });
+
+  $('docs').addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-remove]');
+    if (!btn) return;
+    detachFile(btn.getAttribute('data-remove'));
+  });
+
+  /* ═══ Wiring ═════════════════════════════════════════════════════════ */
+  function simulate(type, note, extra) {
+    var event = Object.assign({
+      type: type, steps: state.steps, documents: state.docs
+    }, extra || {});
+    applyReasoning(CB.getAgentReasoning(state.profile, event));
+    renderSidebar();
+    renderPathway();
+    renderLog();
+    if (note) toast(note);
   }
 
   $('sim-conflict').addEventListener('click', function () {
-    simulate('conflict.simulate', 'Conflict detected. The agent has flagged two steps.');
+    var before = state.log.length;
+    simulate('conflict.simulate', null);
+    if (state.log.length === before) { toast('No conflict rule for this pathway.'); return; }
+    /* The agent declines when the document it would read is not on file. */
+    toast(state.log[0].kind === 'conflict'
+      ? 'Conflict detected. The agent has flagged two steps.'
+      : 'The agent needs that document on file before it can check.');
   });
+
   $('sim-rejection').addEventListener('click', function () {
-    simulate('rejection.simulate', 'Document rejected. A remediation step has been added.');
+    var docId = $('sim-reject-doc').value;
+    if (!docId) return;
+    simulate('rejection.simulate', null, { targetDocId: docId });
+    var doc = docFor(docId);
+    toast((doc ? doc.name : 'Document') + ' returned. A remediation step has been added.');
   });
   $('sim-reset').addEventListener('click', function () {
     simulate('pathway.reset', 'Case reset to the original pathway.');
@@ -565,6 +742,7 @@
 
   /* ── First paint ────────────────────────────────────────────────────── */
   populateTrainedIn();
+  populateTargetCountries();
   populateTrainedRegion();
   populateRegions();
   renderCaseSlip();

@@ -73,20 +73,13 @@
         <p class="field__error" id="err-trainedInRegion" hidden></p>
       </div>
 
-      <fieldset class="field field--fieldset" data-field="country">
-        <legend class="field__label">Target country</legend>
-        <div class="segmented" id="in-country">
-          <label class="segmented__opt">
-            <input type="radio" name="country" value="Canada">
-            <span>Canada</span>
-          </label>
-          <label class="segmented__opt">
-            <input type="radio" name="country" value="United States">
-            <span>United States</span>
-          </label>
-        </div>
+      <div class="field" data-field="country">
+        <label class="field__label" for="in-country">Target country</label>
+        <select class="input input--select" id="in-country" name="country">
+          <option value="">Choose a target country</option>
+        </select>
         <p class="field__error" id="err-country" hidden></p>
-      </fieldset>
+      </div>
 
       <div class="field" data-field="region">
         <label class="field__label" for="in-region">Target region</label>
@@ -136,22 +129,48 @@
       </section>
 
       <section class="panel">
-        <h2 class="panel__title">Documents on file</h2>
+        <h2 class="panel__title">Your documents</h2>
+        <p class="panel__note">
+          The documents this pathway asks for. Upload one and the steps that need it stop waiting.
+          Files stay in this browser tab.
+        </p>
         <ul class="docs" id="docs"></ul>
+        <p class="docs__tally" id="docs-tally"></p>
       </section>
 
       <section class="panel">
         <h2 class="panel__title">Simulate a scenario</h2>
-        <p class="panel__note">Send an event to the agent and watch it reason over the pathway again.</p>
+        <p class="panel__note">
+          Two things that go wrong in real cases. Send one to the agent and watch it reason again.
+        </p>
         <div class="sim">
-          <button class="btn btn--quiet" type="button" id="sim-conflict">
-            <span class="sim__dot sim__dot--amber" aria-hidden="true"></span>
-            Trigger a schedule conflict
-          </button>
-          <button class="btn btn--quiet" type="button" id="sim-rejection">
-            <span class="sim__dot sim__dot--rust" aria-hidden="true"></span>
-            Trigger a document rejection
-          </button>
+
+          <div class="sim__item">
+            <button class="btn btn--quiet" type="button" id="sim-conflict">
+              <span class="sim__dot sim__dot--amber" aria-hidden="true"></span>
+              Trigger a schedule conflict
+            </button>
+            <p class="sim__hint">
+              Two steps whose dates collide — a document expiring before a later step is decided, or an
+              exam result landing after a deadline.
+            </p>
+          </div>
+
+          <div class="sim__item">
+            <button class="btn btn--quiet" type="button" id="sim-rejection">
+              <span class="sim__dot sim__dot--rust" aria-hidden="true"></span>
+              Trigger a document rejection
+            </button>
+            <p class="sim__hint">
+              A document is returned by the body assessing it, and every step that needs it goes back to
+              waiting.
+            </p>
+            <label class="sim__pick">
+              <span class="sim__picklabel" for="sim-reject-doc">Document to return</span>
+              <select class="input input--select input--sm" id="sim-reject-doc"></select>
+            </label>
+          </div>
+
           <button class="btn btn--ghost" type="button" id="sim-reset">Reset the case</button>
         </div>
       </section>
