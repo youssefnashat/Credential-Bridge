@@ -27,6 +27,8 @@ A caseworker enters an applicant (name, profession, country trained, target coun
 The model makes the decisions: ordering, which pair collides, the explanation. They come back through **Strands structured output** validated against the pydantic contract, not through templated strings. **Grounding is enforced in code:** after the model answers, `_ground()` in `backend/app/agent.py` sets `regulator` / `regulatorUrl` from the grounding lookup, and removes any step `sourceUrl` that isn't in that jurisdiction's URL set.
 
 ## Demo
+**Live demo:** https://logjufgxwjxpwmpts7lsrs4vjq0vxsvx.lambda-url.us-west-2.on.aws/. The same web UI, in front of the AgentCore Runtime through a small Lambda proxy ([deploy/live-demo/](deploy/live-demo/README.md)). Claude is currently served through the Anthropic API while our Bedrock model access is under review; usage is capped. Each agent step takes about a minute.
+
 Video: _link pending_. The shot plan and the exact command behind each beat are in [docs/VIDEO_SCRIPT.md](docs/VIDEO_SCRIPT.md) (see its *Command sheet*).
 
 ## Accuracy
@@ -46,7 +48,7 @@ This measures provenance, not correctness: it shows that each cited URL belongs 
 
   Output is structured into `ReasonResponse`, with a validated text-parse fallback, and then passed through `_ground()`.
 - **Grounding** (`backend/app/reference.py`): maps the free-text profile to a jurisdiction key, reads `kb/store/<JURIS>/<profession>.json` first and `backend/reference/regulators.json` as a fallback, and returns `unregulated` or `unknown_region` instead of guessing.
-- **AgentCore Runtime** (`backend/agentcore_entrypoint.py`) wraps the same `reason()` and is deployed as `credential_bridge` in us-west-2 (see [AgentCore](#agentcore)). The UI calls FastAPI, because invoking the Runtime needs SigV4-signed AWS requests.
+- **AgentCore Runtime** (`backend/agentcore_entrypoint.py`) wraps the same `reason()` and is deployed as `credential_bridge` in us-west-2 (see [AgentCore](#agentcore)). Locally the UI calls FastAPI; the public live demo reaches the Runtime through a small Lambda proxy (`deploy/live-demo/`), because invoking the Runtime needs SigV4-signed AWS requests.
 
 Mermaid source and component table: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Concurrency: [docs/ORCHESTRATION.md](docs/ORCHESTRATION.md).
 
@@ -152,7 +154,7 @@ Reproduce with `ls kb/store/*/` and `python3 -m json.tool backend/reference/regu
 To grow the KB (needs AWS): `.venv/bin/python ../kb/pipeline/run_harvest_batch.py --limit 1` from `backend/`. It works through `kb/sources/harvest_queue.jsonl` with the harvester Strands agent, validates each ruleset before writing it, and marks it `needs_review: true`.
 
 ## AgentCore
-**Status: deployed.** The Runtime `credential_bridge` runs in us-west-2. It was built with CodeBuild (no local Docker) and has AgentCore memory turned off. `backend/agentcore_entrypoint.py` is a `BedrockAgentCoreApp` whose `@app.entrypoint` accepts the `/reason` body and returns the same response from the same `reason()`. A live `agentcore invoke` for Aida Torres returned a grounded Ontario pathway with CNO as the regulator: [docs/evidence/agentcore-invoke-20260914T0155Z.txt](docs/evidence/agentcore-invoke-20260914T0155Z.txt).
+**Status: deployed.** The Runtime `credential_bridge` runs in us-west-2. It was built with CodeBuild (no local Docker) and has AgentCore memory turned off. `backend/agentcore_entrypoint.py` is a `BedrockAgentCoreApp` whose `@app.entrypoint` accepts the `/reason` body and returns the same response from the same `reason()`. A live `agentcore invoke` for Aida Torres returned a grounded Ontario pathway with CNO as the regulator: [docs/evidence/agentcore-invoke-20260914T0155Z.txt](docs/evidence/agentcore-invoke-20260914T0155Z.txt). Bedrock model access on our account was later suspended pending review, so since 2026-09-14 the Runtime runs with `CREDBRIDGE_PROVIDER=anthropic`: the same agent and tools, with Claude Sonnet 4.6 served through the Anthropic API. Setting it back to `bedrock` needs no code change.
 
 Deploy from the repo root with the starter toolkit's `agentcore` CLI (`pip install bedrock-agentcore-starter-toolkit`, 0.3.12, where `launch` is now `deploy`):
 ```bash
@@ -161,7 +163,7 @@ agentcore deploy --env CREDBRIDGE_MODEL=us.anthropic.claude-sonnet-4-6 --env AWS
 agentcore invoke '{"profile":{"name":"Aida Torres","profession":"Registered Nurse","countryTrained":"Philippines","targetCountry":"Canada","targetRegion":"Ontario"},"event":"build_pathway","currentSteps":[]}'
 agentcore destroy        # teardown
 ```
-The toolkit now prints a notice that it's no longer supported and points to the newer AgentCore CLI (`npm install -g @aws/agentcore`); we haven't moved to it. The execution role needs `bedrock:InvokeModel` for the model in us-west-2. The Runtime is invoked with SigV4-signed AWS requests, so the browser UI keeps calling FastAPI `/reason`. Putting the UI in front of the Runtime would take a small authenticated proxy, which isn't built.
+The toolkit now prints a notice that it's no longer supported and points to the newer AgentCore CLI (`npm install -g @aws/agentcore`); we haven't moved to it. The execution role needs `bedrock:InvokeModel` for the model in us-west-2. The Runtime is invoked with SigV4-signed AWS requests, so a browser can't call it directly. The public live demo puts a small Lambda proxy with a usage cap in front of it: see [deploy/live-demo/README.md](deploy/live-demo/README.md).
 
 ## Data sources & honesty note
 - **Curated KB.** All 8 KB rulesets are `harvest_method: "curated"` from official regulator pages, and each carries `source` URLs, a `confidence` and `needs_review`. `regulators.json` is a compact curated table for pairs not yet in the KB.
@@ -175,7 +177,7 @@ The toolkit now prints a notice that it's no longer supported and points to the 
 - Expose the case graph already in the repo (`backend/app/orchestration/case_graph.py`: Strands `GraphBuilder`, pathway → human-approval edge → finalize) and the deadline watcher (`backend/app/agents/watcher.py`) through the API.
 - Close the same-session race: hold the session for the whole event.
 - Harvest the queued pairs in `kb/sources/harvest_queue.jsonl`, with human review before `needs_review` flips.
-- An authenticated proxy so the UI can call the AgentCore Runtime directly.
+- Switch the live demo back to Amazon Bedrock once our model access is restored.
 - Swap the file-backed session store for DynamoDB or AgentCore Memory; scope CORS down from `*`.
 
 ## License

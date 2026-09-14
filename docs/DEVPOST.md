@@ -43,7 +43,7 @@ Behind the UI is one contract, `POST /reason`. A stateful variant (`POST /sessio
 - **Compliance KB** (`kb/`): a JSON Schema for one ruleset per profession × jurisdiction, and an ontology that defines requirement kinds, `valid_at`, `validity_months` and `depends_on`. `build_kb_index.py` validates every ruleset without AWS. Every source URL was checked on 2026-09-13 (`docs/evidence/url-check.md`).
 - **Web UI**: a static, framework-free frontend (HTML/CSS/vanilla JS). One file, `agent.js`, is the seam: an adapter maps the UI's view model onto `POST /reason` and back, and rejects any reply that isn't in the contract shape. `?mock=1` runs the original offline demo, clearly labelled "Demo mode".
 - **Serving**: FastAPI with a session orchestrator. Each session's state is written atomically under a per-session lock, and `POST /batch` runs many sessions concurrently on a bounded pool (`CREDBRIDGE_MAX_CONCURRENCY`).
-- **AgentCore Runtime**: the same `reason()` behind a `BedrockAgentCoreApp` entrypoint, deployed as `credential_bridge` in us-west-2 with the `agentcore` CLI (built with CodeBuild, memory off). A live invoke returned a grounded Ontario pathway (`docs/evidence/agentcore-invoke-20260914T0155Z.txt`). The browser calls FastAPI, because the Runtime is invoked with SigV4-signed AWS requests.
+- **AgentCore Runtime**: the same `reason()` behind a `BedrockAgentCoreApp` entrypoint, deployed as `credential_bridge` in us-west-2 with the `agentcore` CLI (built with CodeBuild, memory off). A live invoke returned a grounded Ontario pathway (`docs/evidence/agentcore-invoke-20260914T0155Z.txt`). Locally the browser calls FastAPI; the public live demo reaches the Runtime through a small Lambda proxy (`deploy/live-demo/`), because the Runtime is invoked with SigV4-signed AWS requests.
 - **Harvester agent** (`backend/app/agents/harvester.py`): a second Strands agent that reads a regulator page and emits a schema-valid ruleset marked `needs_review: true`. **Case graph** (`backend/app/orchestration/case_graph.py`): a Strands `GraphBuilder` graph with a human-approval edge before finalize. Both are in the repo but not on the request path yet.
 - **Evaluation**: `backend/eval_run.py` fires 7 scenarios at the live endpoint and scores contract validity, grounding (every `sourceUrl` against the jurisdiction's curated URLs), delay semantics, and the unregulated-profession judgment. `tests_smoke.py` and `tests_offline.py` cover the contract, grounding reachability, concurrency and `_ground()` without AWS.
 
@@ -71,7 +71,7 @@ Behind the UI is one contract, `POST /reason`. A stateful variant (`POST /sessio
 
 ## What's next
 - Expose the case graph (human approval before a case finalizes) and the deadline watcher through the API.
-- An authenticated proxy so the UI can call the AgentCore Runtime directly.
+- Switch the live demo back to Amazon Bedrock once our model access is restored.
 - Close the remaining same-session race: two simultaneous events on one case can both start from the same stored steps.
 - Harvest the queued jurisdictions, with human review before any ruleset is marked reviewed.
 - Durable session storage (DynamoDB or AgentCore Memory) and caseworker sign-off.
@@ -83,7 +83,7 @@ python · strands-agents · amazon-bedrock · anthropic-claude (Claude Sonnet 4.
 ## Links
 - Repository: https://github.com/youssefnashat/Credential-Bridge (Apache-2.0)
 - Video: _TODO(team): public YouTube/Vimeo link (≤5 min)_
-- Live demo: the AgentCore Runtime (`credential_bridge`, us-west-2) needs AWS-signed requests, so there's no public URL. The web UI runs locally against FastAPI; see the README's *Run it*.
+- Live demo: https://logjufgxwjxpwmpts7lsrs4vjq0vxsvx.lambda-url.us-west-2.on.aws/ (the web UI in front of the AgentCore Runtime through a small Lambda proxy, `deploy/live-demo/`). Claude is currently served through the Anthropic API while our Bedrock model access is under review; usage is capped.
 - Architecture diagram: `docs/architecture.png`
 - builder.aws posts: _TODO(team): links once published (titles in docs/BLOG_PLAN.md)_
 
