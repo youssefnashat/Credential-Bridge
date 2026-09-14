@@ -1,0 +1,15 @@
+{
+  "profession": "Registered Nurse", "jurisdiction": "AU", "region_name": "Australia", "country": "Australia",
+  "regulator": "Nursing and Midwifery Board of Australia (NMBA / AHPRA)", "gateway": "AHPRA", "regulated": true,
+  "source": "https://www.nursingmidwiferyboard.gov.au/Registration-Standards.aspx",
+  "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.8, "needs_review": true,
+  "requirements": [
+    {"order":1,"kind":"evaluation","name":"Portfolio / qualification assessment (self-check via AHPRA)","body":"AHPRA","detail":"Determine outcome-based assessment pathway.","valid_at":"application","source":"https://www.ahpra.gov.au/"},
+    {"order":2,"kind":"language","name":"English language skills registration standard","body":"IELTS/OET","detail":"Meet the NMBA English language standard.","validity_months":24,"valid_at":"application","source":"https://www.nursingmidwiferyboard.gov.au/Registration-Standards.aspx"},
+    {"order":3,"kind":"exam","name":"NCLEX (outcomes-based assessment, cognitive)","body":"NCSBN","detail":"Cognitive component of the outcomes-based assessment pathway.","depends_on":["Portfolio / qualification assessment (self-check via AHPRA)"],"valid_at":"exam","source":"https://www.nursingmidwiferyboard.gov.au/"},
+    {"order":4,"kind":"exam","name":"OSCE (outcomes-based assessment, behavioural)","body":"NMBA test centres","detail":"Behavioural/clinical component in Australia.","depends_on":["NCLEX (outcomes-based assessment, cognitive)"],"valid_at":"exam","source":"https://www.nursingmidwiferyboard.gov.au/"},
+    {"order":5,"kind":"registration","name":"AHPRA registration","body":"AHPRA","detail":"Register once assessment components are complete.","depends_on":["OSCE (outcomes-based assessment, behavioural)"],"valid_at":null,"source":"https://www.ahpra.gov.au/"}
+  ],
+  "notes": "Australia adopted an outcomes-based assessment combining a cognitive (NCLEX) and behavioural (OSCE) step.",
+  "last_verified": "2026-09-13"
+}

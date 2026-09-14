@@ -1,0 +1,14 @@
+{
+  "profession": "Registered Nurse", "jurisdiction": "US-NY", "region_name": "New York", "country": "United States",
+  "regulator": "NYSED Office of the Professions", "gateway": "CGFNS", "regulated": true,
+  "source": "https://www.op.nysed.gov/professions/registered-professional-nursing",
+  "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.85, "needs_review": false,
+  "requirements": [
+    {"order":1,"kind":"evaluation","name":"CGFNS Credentials Evaluation (CES)","body":"CGFNS","detail":"Course-by-course evaluation of foreign nursing education.","valid_at":"application","source":"https://www.cgfns.org/services/"},
+    {"order":2,"kind":"language","name":"English proficiency (TOEFL iBT)","body":"ETS","detail":"Required where education was not in English.","validity_months":24,"valid_at":"registration_decision","source":"https://www.op.nysed.gov/professions/registered-professional-nursing"},
+    {"order":3,"kind":"exam","name":"NCLEX-RN","body":"NCSBN","detail":"National licensure exam; apply to NYSED for eligibility first.","depends_on":["CGFNS Credentials Evaluation (CES)"],"valid_at":"exam","source":"https://www.ncsbn.org/exams.htm"},
+    {"order":4,"kind":"registration","name":"NYSED licensure application","body":"NYSED","detail":"Apply for licensure and first registration.","depends_on":["NCLEX-RN"],"valid_at":null,"source":"https://www.op.nysed.gov/"}
+  ],
+  "notes": "US NCLEX is the same exam as Canada; CGFNS replaces NNAS as the gateway.",
+  "last_verified": "2026-09-13"
+}

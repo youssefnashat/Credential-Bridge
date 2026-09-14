@@ -1,0 +1,8 @@
+{"region":"CA","jurisdiction":"CA-ON","authority_list":"https://www.ontario.ca/page/work-your-profession-or-trade","method":"scrape","status":"live"}
+{"region":"CA","jurisdiction":"CA-AB","authority_list":"https://www.alberta.ca/regulatory-bodies","method":"scrape","status":"live"}
+{"region":"CA","jurisdiction":"CA-BC","authority_list":"https://www2.gov.bc.ca/gov/content/governments/organizational-structure/ministries-organizations/regulatory-authorities/list","method":"scrape","status":"live"}
+{"region":"CA","jurisdiction":"CA-ALL","authority_list":"https://www.cicic.ca/902/explorez_le_repertoire_des_profils_des_professions.canada","method":"playwright","status":"fallback","note":"~500 profiles, ASP.NET postback"}
+{"region":"EU","jurisdiction":"EU","authority_list":"https://ec.europa.eu/growth/tools-databases/regprof/","method":"api_or_seed","status":"seed","note":"REGPROF: profession x member-state x competent authority"}
+{"region":"GB","jurisdiction":"GB","authority_list":"https://cpq.ecctis.com/","method":"seed","status":"seed"}
+{"region":"AU","jurisdiction":"AU","authority_list":"https://www.ahpra.gov.au/","method":"seed","status":"seed","note":"AHPRA national boards (health) + state boards"}
+{"region":"US","jurisdiction":"US-ALL","authority_list":"seed","method":"seed","status":"seed","note":"no federal source; per-state boards + CGFNS/NCEES/ECFMG"}

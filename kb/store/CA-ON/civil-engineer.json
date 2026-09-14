@@ -1,0 +1,14 @@
+{
+  "profession": "Civil Engineer", "jurisdiction": "CA-ON", "region_name": "Ontario", "country": "Canada",
+  "regulator": "Professional Engineers Ontario (PEO)", "gateway": null, "regulated": true,
+  "source": "https://www.peo.on.ca/apply/become-professional-engineer",
+  "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.85, "needs_review": false,
+  "requirements": [
+    {"order":1,"kind":"evaluation","name":"Academic requirements assessment","body":"PEO","detail":"PEO reviews your degree; may assign technical exams if the program isn't recognized.","valid_at":"application","source":"https://www.peo.on.ca/apply/become-professional-engineer"},
+    {"order":2,"kind":"exam","name":"Professional Practice Exam (PPE)","body":"PEO","detail":"Law and ethics exam required of all applicants.","depends_on":[],"valid_at":"registration_decision","source":"https://www.peo.on.ca/"},
+    {"order":3,"kind":"experience","name":"48 months engineering experience","body":"PEO","detail":"Acceptable engineering work experience; ~12 months in a Canadian jurisdiction is preferred.","validity_months":null,"valid_at":"registration_decision","source":"https://www.peo.on.ca/"},
+    {"order":4,"kind":"registration","name":"P.Eng. licence application","body":"PEO","detail":"Final application once academics, PPE and experience are satisfied.","depends_on":["Academic requirements assessment","Professional Practice Exam (PPE)","48 months engineering experience"],"valid_at":null,"source":"https://www.peo.on.ca/"}
+  ],
+  "notes": "Title 'engineer' is protected in Ontario; practice requires the P.Eng. licence.",
+  "last_verified": "2026-09-13"
+}

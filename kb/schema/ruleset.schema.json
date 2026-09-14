@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "JurisdictionRuleSet",
+  "description": "Compliance/regulatory rules for ONE profession in ONE jurisdiction. One file per (profession, jurisdiction).",
+  "type": "object",
+  "required": ["profession", "jurisdiction", "regulator", "source", "harvested_at", "confidence", "requirements", "needs_review"],
+  "properties": {
+    "profession": {"type": "string"},
+    "jurisdiction": {"type": "string", "description": "ISO-style key: CA-ON, US-NY, GB, AU-NSW, DE"},
+    "region_name": {"type": "string"},
+    "country": {"type": "string"},
+    "regulator": {"type": "string", "description": "Legal body that grants the licence"},
+    "gateway": {"type": ["string","null"], "description": "Intake/verification body feeding the regulator, e.g. NNAS, CGFNS, physiciansapply.ca"},
+    "regulated": {"type": "boolean", "description": "false => title/practice not restricted in this jurisdiction"},
+    "source": {"type": "string", "format": "uri", "description": "Regulator page the rules were read from"},
+    "harvested_at": {"type": "string", "format": "date-time"},
+    "harvest_method": {"type": "string", "enum": ["curated","agent","hybrid"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "needs_review": {"type": "boolean"},
+    "requirements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["order", "kind", "name"],
+        "properties": {
+          "order": {"type": "integer", "description": "presentation/dependency order, 1..n"},
+          "kind": {"type": "string", "enum": ["evaluation","language","exam","experience","bridging","registration","document","fee","background_check","other"]},
+          "name": {"type": "string"},
+          "body": {"type": ["string","null"], "description": "org that administers this requirement"},
+          "detail": {"type": ["string","null"]},
+          "validity_months": {"type": ["integer","null"], "description": "how long this artifact stays valid once obtained"},
+          "valid_at": {"type": ["string","null"], "enum": ["application","registration_decision","exam","continuous", null], "description": "the moment it must still be valid — the crux of expiry-collision reasoning"},
+          "prerequisite_of": {"type": ["string","null"], "description": "name of the requirement this must precede"},
+          "depends_on": {"type": "array", "items": {"type": "string"}, "description": "names of requirements that must complete first"},
+          "source": {"type": ["string","null"], "format": "uri"}
+        }
+      }
+    },
+    "notes": {"type": ["string","null"]},
+    "last_verified": {"type": ["string","null"], "format": "date"}
+  }
+}

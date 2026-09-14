@@ -1,0 +1,15 @@
+{
+  "profession": "Registered Nurse", "jurisdiction": "CA-ON", "region_name": "Ontario", "country": "Canada",
+  "regulator": "College of Nurses of Ontario (CNO)", "gateway": "NNAS", "regulated": true,
+  "source": "https://www.cno.org/en/become-a-nurse/registration-requirements/internationally-educated-nurses/",
+  "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.9, "needs_review": false,
+  "requirements": [
+    {"order":1,"kind":"evaluation","name":"NNAS Advisory Report","body":"NNAS","detail":"Create NNAS application; submit education, registration history, and identity documents for verification.","validity_months":60,"valid_at":"application","prerequisite_of":"CNO registration application","source":"https://www.nnas.ca/"},
+    {"order":2,"kind":"language","name":"Language proficiency (IELTS Academic / CELBAN / OET)","body":"IELTS/CELBAN","detail":"Required if education/experience was not in English/French. CELBAN is nursing-specific.","validity_months":24,"valid_at":"registration_decision","depends_on":[],"source":"https://www.cno.org/en/become-a-nurse/registration-requirements/internationally-educated-nurses/"},
+    {"order":3,"kind":"registration","name":"CNO registration application","body":"CNO","detail":"Apply to CNO; NNAS report is released to CNO for review against Ontario requirements.","depends_on":["NNAS Advisory Report"],"valid_at":null,"source":"https://www.cno.org/"},
+    {"order":4,"kind":"exam","name":"NCLEX-RN","body":"NCSBN","detail":"National licensure exam. Must be eligible via CNO before registering for the exam.","depends_on":["CNO registration application"],"valid_at":"exam","source":"https://www.ncsbn.org/exams.htm"},
+    {"order":5,"kind":"background_check","name":"Evidence of practice / criminal record check","body":"CNO","detail":"Declaration and, where required, police record check.","valid_at":"registration_decision","source":"https://www.cno.org/"}
+  ],
+  "notes": "Language test must be valid at the registration decision, not merely at application — a common expiry collision when NNAS/exam timelines slip.",
+  "last_verified": "2026-09-13"
+}

@@ -1,0 +1,14 @@
+{
+  "profession": "Registered Nurse", "jurisdiction": "CA-BC", "region_name": "British Columbia", "country": "Canada",
+  "regulator": "BC College of Nurses and Midwives (BCCNM)", "gateway": "NNAS", "regulated": true,
+  "source": "https://www.bccnm.ca/RN/applications_registration/Pages/Default.aspx",
+  "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.8, "needs_review": true,
+  "requirements": [
+    {"order":1,"kind":"evaluation","name":"NNAS Advisory Report","body":"NNAS","detail":"Same national gateway as other Canadian provinces; report is shared with BCCNM.","validity_months":60,"valid_at":"application","prerequisite_of":"BCCNM registration application","source":"https://www.nnas.ca/"},
+    {"order":2,"kind":"language","name":"English proficiency (IELTS Academic / CELBAN)","body":"IELTS/CELBAN","detail":"Required where prior education/practice was not in English.","validity_months":24,"valid_at":"registration_decision","source":"https://www.bccnm.ca/RN/applications_registration/Pages/Default.aspx"},
+    {"order":3,"kind":"registration","name":"BCCNM registration application","body":"BCCNM","detail":"Apply to BCCNM; assessment may require a competence assessment (e.g. NCAS).","depends_on":["NNAS Advisory Report"],"valid_at":null,"source":"https://www.bccnm.ca/"},
+    {"order":4,"kind":"exam","name":"NCLEX-RN","body":"NCSBN","detail":"National licensure exam; eligibility via BCCNM.","depends_on":["BCCNM registration application"],"valid_at":"exam","source":"https://www.ncsbn.org/exams.htm"}
+  ],
+  "notes": "BC often uses NCAS (Nursing Community Assessment Service) as a competence assessment step in addition to NNAS.",
+  "last_verified": "2026-09-13"
+}

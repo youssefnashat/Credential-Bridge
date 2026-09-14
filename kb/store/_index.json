@@ -1,0 +1,89 @@
+{
+  "stats": {
+    "rulesets": 8,
+    "jurisdictions": 7,
+    "professions": 2
+  },
+  "entries": [
+    {
+      "profession": "Registered Nurse",
+      "jurisdiction": "AU",
+      "regulator": "Nursing and Midwifery Board of Australia (NMBA / AHPRA)",
+      "regulated": true,
+      "requirements": 5,
+      "confidence": 0.8,
+      "source": "https://www.nursingmidwiferyboard.gov.au/Registration-Standards.aspx",
+      "method": "curated"
+    },
+    {
+      "profession": "Registered Nurse",
+      "jurisdiction": "CA-BC",
+      "regulator": "BC College of Nurses and Midwives (BCCNM)",
+      "regulated": true,
+      "requirements": 4,
+      "confidence": 0.8,
+      "source": "https://www.bccnm.ca/RN/applications_registration/Pages/Default.aspx",
+      "method": "curated"
+    },
+    {
+      "profession": "Civil Engineer",
+      "jurisdiction": "CA-ON",
+      "regulator": "Professional Engineers Ontario (PEO)",
+      "regulated": true,
+      "requirements": 4,
+      "confidence": 0.85,
+      "source": "https://www.peo.on.ca/apply/become-professional-engineer",
+      "method": "curated"
+    },
+    {
+      "profession": "Registered Nurse",
+      "jurisdiction": "CA-ON",
+      "regulator": "College of Nurses of Ontario (CNO)",
+      "regulated": true,
+      "requirements": 5,
+      "confidence": 0.9,
+      "source": "https://www.cno.org/en/become-a-nurse/registration-requirements/internationally-educated-nurses/",
+      "method": "curated"
+    },
+    {
+      "profession": "Registered Nurse",
+      "jurisdiction": "DE",
+      "regulator": "State recognition authority (Anerkennungsbeh\u00f6rde des Bundeslandes)",
+      "regulated": true,
+      "requirements": 5,
+      "confidence": 0.8,
+      "source": "https://www.anerkennung-in-deutschland.de/en/interest/finder/profession",
+      "method": "curated"
+    },
+    {
+      "profession": "Registered Nurse",
+      "jurisdiction": "GB",
+      "regulator": "Nursing and Midwifery Council (NMC)",
+      "regulated": true,
+      "requirements": 5,
+      "confidence": 0.8,
+      "source": "https://www.nmc.org.uk/registration/joining-the-register/trained-outside-the-uk/",
+      "method": "curated"
+    },
+    {
+      "profession": "Registered Nurse",
+      "jurisdiction": "US-CA",
+      "regulator": "California Board of Registered Nursing (BRN)",
+      "regulated": true,
+      "requirements": 4,
+      "confidence": 0.78,
+      "source": "https://www.rn.ca.gov/applicants/lic-intl.shtml",
+      "method": "curated"
+    },
+    {
+      "profession": "Registered Nurse",
+      "jurisdiction": "US-NY",
+      "regulator": "NYSED Office of the Professions",
+      "regulated": true,
+      "requirements": 4,
+      "confidence": 0.85,
+      "source": "https://www.op.nysed.gov/professions/registered-professional-nursing",
+      "method": "curated"
+    }
+  ]
+}

@@ -1,0 +1,250 @@
+{
+  "Registered Nurse": {
+    "CA-ON": {
+      "regulator": "College of Nurses of Ontario (CNO)",
+      "gateway": "NNAS",
+      "url": "https://www.cno.org/en/become-a-nurse/registration-requirements/internationally-educated-nurses/",
+      "eval": "NNAS Advisory Report",
+      "language": [
+        "IELTS Academic",
+        "CELBAN",
+        "OET"
+      ],
+      "exam": "NCLEX-RN",
+      "language_validity_months": 24,
+      "eval_validity_months": 60,
+      "notes": "NNAS report feeds CNO; language test must be valid at time of registration decision, not just application."
+    },
+    "CA-BC": {
+      "regulator": "BC College of Nurses and Midwives (BCCNM)",
+      "gateway": "NNAS",
+      "url": "https://www.bccnm.ca/RN/applications_registration/Pages/Default.aspx",
+      "eval": "NNAS Advisory Report",
+      "language": [
+        "IELTS Academic",
+        "CELBAN"
+      ],
+      "exam": "NCLEX-RN",
+      "language_validity_months": 24,
+      "eval_validity_months": 60
+    },
+    "CA-AB": {
+      "regulator": "College of Registered Nurses of Alberta (CRNA)",
+      "gateway": "NNAS",
+      "url": "https://nurses.ab.ca/apply-here/internationally-educated-nurses/",
+      "eval": "NNAS Advisory Report",
+      "language": [
+        "IELTS Academic",
+        "CELBAN"
+      ],
+      "exam": "NCLEX-RN",
+      "language_validity_months": 24,
+      "eval_validity_months": 60
+    },
+    "US-NY": {
+      "regulator": "NYSED Office of the Professions",
+      "gateway": "CGFNS",
+      "url": "https://www.op.nysed.gov/professions/registered-professional-nursing",
+      "eval": "CGFNS Credentials Evaluation",
+      "language": [
+        "TOEFL iBT"
+      ],
+      "exam": "NCLEX-RN",
+      "language_validity_months": 24,
+      "eval_validity_months": null
+    },
+    "US-CA": {
+      "regulator": "California Board of Registered Nursing",
+      "gateway": "direct",
+      "url": "https://www.rn.ca.gov/applicants/lic-intl.shtml",
+      "eval": "Board-approved transcript evaluation",
+      "language": [
+        "TOEFL iBT"
+      ],
+      "exam": "NCLEX-RN",
+      "language_validity_months": 24,
+      "eval_validity_months": null
+    },
+    "US-TX": {
+      "regulator": "Texas Board of Nursing",
+      "gateway": "CGFNS",
+      "url": "https://www.bon.texas.gov/licensure_endorsement.asp",
+      "eval": "CGFNS Credentials Evaluation",
+      "language": [
+        "TOEFL iBT"
+      ],
+      "exam": "NCLEX-RN",
+      "language_validity_months": 24,
+      "eval_validity_months": null
+    },
+    "GB": {
+      "regulator": "Nursing and Midwifery Council (NMC)",
+      "gateway": null,
+      "url": "https://www.nmc.org.uk/registration/joining-the-register/trained-outside-the-uk/",
+      "eval": "NMC qualification check",
+      "language": [
+        "IELTS Academic",
+        "OET"
+      ],
+      "exam": "CBT + OSCE",
+      "language_validity_months": 24,
+      "eval_validity_months": null
+    },
+    "AU": {
+      "regulator": "NMBA / AHPRA",
+      "gateway": "AHPRA",
+      "url": "https://www.nursingmidwiferyboard.gov.au/Registration-Standards.aspx",
+      "eval": "Outcomes-based assessment",
+      "language": [
+        "IELTS",
+        "OET"
+      ],
+      "exam": "NCLEX + OSCE",
+      "language_validity_months": 24,
+      "eval_validity_months": null
+    },
+    "DE": {
+      "regulator": "State recognition authority (Anerkennung)",
+      "gateway": "anerkennung-in-deutschland.de",
+      "url": "https://www.anerkennung-in-deutschland.de/en/interest/finder/profession",
+      "eval": "Equivalency assessment (PflBG)",
+      "language": [
+        "German B2 + Fachsprachpr\u00fcfung"
+      ],
+      "exam": "Kenntnispr\u00fcfung (if deficits)",
+      "language_validity_months": null,
+      "eval_validity_months": null
+    }
+  },
+  "Physician": {
+    "CA-ON": {
+      "regulator": "College of Physicians and Surgeons of Ontario (CPSO)",
+      "gateway": "physiciansapply.ca",
+      "url": "https://www.cpso.on.ca/en/Physicians/Registration",
+      "eval": "Source Verification (physiciansapply.ca)",
+      "language": [
+        "IELTS Academic",
+        "OET"
+      ],
+      "exam": "MCCQE Part I",
+      "language_validity_months": 24,
+      "eval_validity_months": null,
+      "notes": "Requires postgraduate training + often a period of supervised practice; residency via CaRMS may apply."
+    },
+    "US-NY": {
+      "regulator": "NYSED / ECFMG",
+      "gateway": "ECFMG",
+      "url": "https://www.op.nysed.gov/professions/medicine",
+      "eval": "ECFMG Certification",
+      "language": [
+        "OET Medicine"
+      ],
+      "exam": "USMLE Step 1/2/3",
+      "language_validity_months": 24,
+      "eval_validity_months": null
+    }
+  },
+  "Civil Engineer": {
+    "CA-ON": {
+      "regulator": "Professional Engineers Ontario (PEO)",
+      "gateway": "direct",
+      "url": "https://www.peo.on.ca/apply/become-professional-engineer",
+      "eval": "Academic assessment (PEO / possible technical exams)",
+      "language": [
+        "IELTS"
+      ],
+      "exam": "PPE (Professional Practice Exam)",
+      "experience_months": 48,
+      "eval_validity_months": null,
+      "notes": "48 months acceptable engineering experience, ~12 in a Canadian jurisdiction preferred; NPPE/PPE required."
+    },
+    "CA-BC": {
+      "regulator": "Engineers and Geoscientists BC (EGBC)",
+      "gateway": "direct",
+      "url": "https://www.egbc.ca/Registration",
+      "eval": "Academic review",
+      "language": [
+        "IELTS"
+      ],
+      "exam": "NPPE",
+      "experience_months": 48
+    },
+    "CA-AB": {
+      "regulator": "APEGA",
+      "gateway": "direct",
+      "url": "https://www.apega.ca/apply",
+      "eval": "Academic review / FE exams possible",
+      "language": [
+        "IELTS"
+      ],
+      "exam": "NPPE",
+      "experience_months": 48
+    },
+    "US-CA": {
+      "regulator": "California Board for Professional Engineers (BPELSG)",
+      "gateway": "direct",
+      "url": "https://www.bpelsg.ca.gov/applicants/",
+      "eval": "Transcript + experience review",
+      "language": [],
+      "exam": "FE then PE",
+      "experience_months": 48
+    },
+    "US-TX": {
+      "regulator": "Texas Board of Professional Engineers",
+      "gateway": "direct",
+      "url": "https://pels.texas.gov/",
+      "eval": "Transcript + experience review",
+      "language": [],
+      "exam": "FE then PE",
+      "experience_months": 48
+    },
+    "US-NY": {
+      "regulator": "NYSED Office of the Professions",
+      "gateway": "direct",
+      "url": "https://www.op.nysed.gov/professions/professional-engineering",
+      "eval": "Transcript + experience review",
+      "language": [],
+      "exam": "FE then PE",
+      "experience_months": 48
+    }
+  },
+  "Teacher": {
+    "CA-ON": {
+      "regulator": "Ontario College of Teachers (OCT)",
+      "gateway": "direct",
+      "url": "https://www.oct.ca/becoming-a-teacher/internationally-educated-teachers",
+      "eval": "OCT credential review",
+      "language": [
+        "IELTS",
+        "CAEL"
+      ],
+      "exam": null,
+      "language_validity_months": 24,
+      "notes": "Requires teacher education program + practice teaching; language proof if applicable."
+    },
+    "CA-BC": {
+      "regulator": "BC Teacher Regulation Branch",
+      "gateway": "direct",
+      "url": "https://www2.gov.bc.ca/gov/content/education-training/k-12/teach/teacher-regulation",
+      "eval": "TRB credential review",
+      "language": [
+        "IELTS"
+      ],
+      "exam": null
+    },
+    "US-NY": {
+      "regulator": "NYSED Office of Teaching Initiatives",
+      "gateway": "direct",
+      "url": "https://www.nysed.gov/educator-integrity/teacher-certification",
+      "eval": "Course-by-course evaluation",
+      "language": [
+        "TOEFL"
+      ],
+      "exam": "edTPA / certification exams"
+    }
+  },
+  "Software Engineer": {
+    "_unregulated": true,
+    "note": "Software engineering is NOT a licensed/regulated profession in any of these jurisdictions. Using the reserved title 'Professional Engineer' may be restricted (e.g. PEO in Ontario), but practising as a software developer requires no licence. Credential steps here exist only for immigration/work-authorization (e.g. an ECA for Express Entry), not to obtain a right to practise."
+  }
+}

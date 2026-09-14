@@ -1,0 +1,15 @@
+{
+  "profession": "Registered Nurse", "jurisdiction": "DE", "region_name": "Germany", "country": "Germany",
+  "regulator": "State recognition authority (Anerkennungsbehörde des Bundeslandes)", "gateway": "anerkennung-in-deutschland.de (Recognition Finder)", "regulated": true,
+  "source": "https://www.anerkennung-in-deutschland.de/en/interest/finder/profession",
+  "harvested_at": "2026-09-13T00:00:00Z", "harvest_method": "curated", "confidence": 0.8, "needs_review": true,
+  "requirements": [
+    {"order":1,"kind":"evaluation","name":"Antrag auf Anerkennung (equivalency assessment)","body":"State recognition authority","detail":"Apply to the authority in the federal state where you will work; submit certified copies + German translations of diploma, transcripts, CV. Authority compares training to the German standard (Pflegeberufegesetz, PflBG).","validity_months":null,"valid_at":"application","source":"https://www.anerkennung-in-deutschland.de/en/interest/finder/profession"},
+    {"order":2,"kind":"language","name":"German language B2 (CEFR) + Fachsprachprüfung","body":"Recognised language school / authority","detail":"B2 general German plus a specialist medical language examination (Fachsprachprüfung). Entry possible at A2/B1 under a Recognition Partnership (since 1 Mar 2024), full licence needs B2.","validity_months":null,"valid_at":"registration_decision","depends_on":[],"source":"https://www.anerkennung-in-deutschland.de/"},
+    {"order":3,"kind":"background_check","name":"Police clearance + health suitability","body":"State authority","detail":"Impeccable police clearance certificate (Führungszeugnis) and proof of health suitability (Section 2 PflBG).","valid_at":"registration_decision","source":"https://www.anerkennung-in-deutschland.de/"},
+    {"order":4,"kind":"bridging","name":"Adaptation course or knowledge test (Anpassungslehrgang / Kenntnisprüfung) — if deficits","body":"Approved training provider","detail":"If the equivalency check finds gaps (Defizitbescheid — ~85% of non-EU applicants), complete an adaptation period or pass a knowledge test to close them. Conditional on the outcome of step 1.","depends_on":["Antrag auf Anerkennung (equivalency assessment)"],"valid_at":null,"source":"https://www.anerkennung-in-deutschland.de/"},
+    {"order":5,"kind":"registration","name":"Erlaubnis zum Führen der Berufsbezeichnung (licence to use the title)","body":"State authority","detail":"Authority grants the professional licence (Approbation/Berufserlaubnis as Pflegefachperson) once equivalency, language, conduct and any adaptation are satisfied. Decision within ~3-4 months of a complete file.","depends_on":["German language B2 (CEFR) + Fachsprachprüfung","Adaptation course or knowledge test (Anpassungslehrgang / Kenntnisprüfung) — if deficits"],"valid_at":null,"source":"https://www.anerkennung-in-deutschland.de/"}
+  ],
+  "notes": "EU/EEA/Swiss qualifications follow a different (faster) route. Responsible authority and exact language rule vary by Bundesland. Recognition Partnership (Mar 2024) lets applicants enter at A2 and finish while working.",
+  "last_verified": "2026-09-13"
+}

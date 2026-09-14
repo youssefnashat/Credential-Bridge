@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": ["Bash(python *)", "Bash(pytest *)", "Bash(uvicorn *)", "Bash(git *)",
+              "Bash(pip *)", "Bash(aws *)", "Bash(agentcore *)", "Bash(curl *)", "Bash(./*)"]
+  },
+  "hooks": {
+    "SessionStart": [{"hooks": [{"type": "command", "command": "sed -n '1,60p' CLAUDE.md && echo '--- last context ---' && tail -n 12 docs/CONTEXT_LOG.md"}]}],
+    "PreToolUse": [{"matcher": "Bash(git push*)", "hooks": [{"type": "command", "command": "python backend/tests_smoke.py"}]}]
+  }
+}

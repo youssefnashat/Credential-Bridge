@@ -1,0 +1,8 @@
+strands-agents>=1.0
+strands-agents-tools>=0.2
+fastapi>=0.111
+uvicorn[standard]>=0.30
+pydantic>=2.7
+boto3>=1.35
+python-dotenv>=1.0
+bedrock-agentcore>=0.1
